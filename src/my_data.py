@@ -1,6 +1,14 @@
-import obd
+from args import parser
 
-connection = obd.OBD(portstr="/dev/ttyUSB0")
+args = parser.parse_args()
+
+if args.testing == True:
+    import fake_obd as obd
+    connection = obd.FakeOBD()
+
+else:
+    import obd
+    connection = obd.OBD(portstr="/dev/ttyUSB0")
 
 
 class ObdData:
@@ -178,32 +186,31 @@ mids_a = ObdData(
 )
 
 all_data = [
-    # version,
     # o2_sensors,
     # version,
-    # maf,
-    # b1_short_fuel_trim,
-    # b2_short_fuel_trim,
-    # fuel_status,
+    maf,
+    b1_short_fuel_trim,
+    b2_short_fuel_trim,
+    fuel_status,
     # obd_status,
     # pids_a,
     # pids_9a,
     # obd_compliance,
-    # mids_a
+    # mids_a,
     coolant_temp,
     intake_temp,
-    # b1_long_fuel_trim,
-    # b2_long_fuel_trim,
-    # intake_pressure,
-    # timing,
+    b1_long_fuel_trim,
+    b2_long_fuel_trim,
+    intake_pressure,
+    timing,
     engine_load,
-    # o2_b1s1,
-    # o2_b1s2,
-    # o2_b2s1,
-    # o2_b2s2,
-    # elm_voltage,
-    # speed,
-    # rpm,
+    o2_b1s1,
+    o2_b1s2,
+    o2_b2s1,
+    o2_b2s2,
+    elm_voltage,
+    speed,
+    rpm,
     throttle_pos,
 ]
 

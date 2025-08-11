@@ -1,19 +1,33 @@
-import obd
-# import fake_obd as obd
 import sys
 import time
 import csv
+from args import parser
 from utils import check_connection, celsius_to_fahrenheit, convert_to_number
 from my_data import all_data
 from datetime import datetime
 
-print("Starting up...")
+args = parser.parse_args()
 
+print(args.testing)
+
+if args.testing == True:
+    print("fake fake fake")
+    import fake_obd as obd
+else:
+    import obd
+    print("real real real")
+
+
+print("Starting up...")
 
 try:
     print("Connecting...")
-    connection = obd.OBD(portstr="/dev/ttyUSB0")
-    # connection = obd.FakeOBD()
+
+    if args.testing == True:
+        print("Running in test mode with fake obd data")
+        connection = obd.FakeOBD()
+    else:
+        connection = obd.OBD(portstr="/dev/ttyUSB0")
 
     check_connection(connection)
 
