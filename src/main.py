@@ -1,22 +1,18 @@
 import sys
 import time
 import csv
+import os
 from args import parser
-from utils import check_connection, celsius_to_fahrenheit, convert_to_number
+from utils import check_connection, celsius_to_fahrenheit, convert_to_number, get_filename
 from my_data import all_data
 from datetime import datetime
 
 args = parser.parse_args()
 
-print(args.testing)
-
 if args.testing == True:
-    print("fake fake fake")
     import fake_obd as obd
 else:
     import obd
-    print("real real real")
-
 
 print("Starting up...")
 
@@ -31,15 +27,25 @@ try:
 
     check_connection(connection)
 
+# move this to util function
+    if os.path.exists("./logged_data"):
+        print("Logging directory exists")
+    else:
+        print("Logging directory does not exist, creating now")   
+        os.mkdir("./logged_data") 
+
     now = datetime.now()
 
-    csv_name = now.date()
+    current_date = now.date()
+    initial_csv_name = f"./logged_data/{current_date}.csv"
+    csv_name = get_filename(initial_csv_name)
     column_names = [data.name for data in all_data]
     column_names.insert(0, "Time")
-    with open (f"{csv_name}.csv", "w", newline="") as csvfile:
+
+    with open (csv_name, "w", newline="") as csvfile:
         thewriter = csv.DictWriter(csvfile, fieldnames=column_names)
         thewriter.writeheader()
-        print(f"Logging data to '{csv_name}.csv'...")
+        print(f"Logging data to '{csv_name}'...")
 
         while True:
             try:
