@@ -1,5 +1,3 @@
-# import obd
-# from fake_obd import FakeOBD
 import os
 
 def check_connection(connection):
