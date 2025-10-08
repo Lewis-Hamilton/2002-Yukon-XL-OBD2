@@ -37,13 +37,13 @@ COOLANT_TEMP = ObdData(
 ENGINE_LOAD = ObdData(
     name="Engine Load",
     cmd=obd.commands.ENGINE_LOAD,
-    unit=" Percentage"
+    unit="Percentage"
 )
 
 FUEL_STATUS = ObdData(
     name="Fuel Status",
     cmd=obd.commands.FUEL_STATUS,
-    unit="Unkown"
+    unit="Open Loop, Open Loop or Closed Loop, Closed Loop based on temp"
 )
 
 INTAKE_PRESSURE = ObdData(
@@ -73,13 +73,13 @@ LONG_FUEL_TRIM_2 = ObdData(
 MAF = ObdData(
     name="Mass Airflow Sensor",
     cmd=obd.commands.MAF,
-    unit="Unkown"
+    unit="Grams Per Second"
 )
 
 MIDS_A = ObdData(
     name="MIDS A",
     cmd=obd.commands.MIDS_A,
-    unit="Unkown"
+    unit="None"
 )
 
 O2_B1S1 = ObdData(
@@ -109,49 +109,49 @@ O2_B2S2 = ObdData(
 O2_SENSORS = ObdData(
     name="O2 Sensors Status",
     cmd=obd.commands.O2_SENSORS,
-    unit="Unkown"
+    unit="(false, false, true, true) (false, false, true, true)"
 )
 
 OBD_COMPLIANCE = ObdData(
     name="OBD Compliance",
     cmd=obd.commands.OBD_COMPLIANCE,
-    unit="Unkown"
+    unit="String"
 )
 
 PIDS_9A = ObdData(
     name="PIDS 9A",
     cmd=obd.commands.PIDS_9A,
-    unit="Unkown"
+    unit="Bitmask"
 )
 
 PIDS_A = ObdData(
     name="PIDS A",
     cmd=obd.commands.PIDS_A,
-    unit="Unkown"
+    unit="Bitmask"
 )
 
 RPM = ObdData(
     name="RPM",
     cmd=obd.commands.RPM,
-    unit="RPM"
+    unit="Revolutions Per Minute"
 )
 
 SHORT_FUEL_TRIM_1 = ObdData(
     name="Bank 1 Short Fuel Trim",
     cmd=obd.commands.SHORT_FUEL_TRIM_1,
-    unit="Unkown"
+    unit="Percent"
 )
 
 SHORT_FUEL_TRIM_2 = ObdData(
     name="Bank 2 Short Fuel Trim",
     cmd=obd.commands.SHORT_FUEL_TRIM_2,
-    unit="Unkown"
+    unit="Percent"
 )
 
 SPEED = ObdData(
     name="Speed",
     cmd=obd.commands.SPEED,
-    unit="Kilometers"
+    unit="Kilometers Per Hour"
 )
 
 STATUS = ObdData(
@@ -175,7 +175,7 @@ TIMING_ADVANCE = ObdData(
 VERSION = ObdData(
     name="Firmware Version",
     cmd=obd.commands.ELM_VERSION,
-    unit="Unkown"
+    unit="String"
 )
 
 VOLTAGE = ObdData(
