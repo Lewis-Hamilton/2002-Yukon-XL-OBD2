@@ -86,8 +86,8 @@ class FakeOBD:
         elif command.name == "SPEED":
             return FakeOBDResponse(f"{random.randint(0, 160)}.0 kilometer_per_hour")
         elif command.name == "COOLANT_TEMP":
-            # Simulate a Celsius value, as per your my_data.py
-            return FakeOBDResponse(round(random.uniform(80.0, 105.0), 1))
+            # 0 Celsius is 32 Fahrenheit, 0 Fahrenheit is -17 celsius, not sure how it handles negatives
+            return FakeOBDResponse(f"{random.randint(0, 115)} degree_Celsius")
         elif command.name == "ELM_VOLTAGE":
             return FakeOBDResponse(round(random.uniform(11.5, 14.5), 2))
         elif command.name == "THROTTLE_POS":
