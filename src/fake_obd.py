@@ -79,7 +79,10 @@ class FakeOBD:
 
         # Simulate different responses for different commands
         if command.name == "RPM":
-            return FakeOBDResponse(random.randint(700, 2500))
+            num = random.uniform(600, 7000)
+            decimals = random.choice([1, 2])
+            rpm = round(num, decimals)
+            return FakeOBDResponse(f"{rpm} revolutions_per_minute")
         elif command.name == "SPEED":
             return FakeOBDResponse(random.randint(0, 120))
         elif command.name == "COOLANT_TEMP":
