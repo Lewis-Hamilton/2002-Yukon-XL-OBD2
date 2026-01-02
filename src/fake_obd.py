@@ -89,7 +89,7 @@ class FakeOBD:
             # 0 Celsius is 32 Fahrenheit, 0 Fahrenheit is -17 celsius, not sure how it handles negatives
             return FakeOBDResponse(f"{random.randint(0, 115)} degree_Celsius")
         elif command.name == "ELM_VOLTAGE":
-            return FakeOBDResponse(round(random.uniform(11.5, 14.5), 2))
+            return FakeOBDResponse(f"{round(random.uniform(11.0, 15), 1)} volt")
         elif command.name == "THROTTLE_POS":
             return FakeOBDResponse(round(random.uniform(0.0, 99.9), 1))
         elif command.name == "INTAKE_TEMP":
