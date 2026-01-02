@@ -84,7 +84,7 @@ class FakeOBD:
             rpm = round(num, decimals)
             return FakeOBDResponse(f"{rpm} revolutions_per_minute")
         elif command.name == "SPEED":
-            return FakeOBDResponse(random.randint(0, 120))
+            return FakeOBDResponse(f"{random.randint(0, 160)}.0 kilometer_per_hour")
         elif command.name == "COOLANT_TEMP":
             # Simulate a Celsius value, as per your my_data.py
             return FakeOBDResponse(round(random.uniform(80.0, 105.0), 1))
