@@ -12,10 +12,11 @@ else:
 
 
 class ObdData:
-    def __init__(self, name, cmd, unit):
+    def __init__(self, name, cmd, unit, textToReplace):
         self.name = name
         self.cmd = cmd
         self.unit = unit
+        self.textToReplace = textToReplace
     
     @property 
     def response(self):
@@ -25,163 +26,190 @@ class ObdData:
 AUX_INPUT_STATUS = ObdData(
     name="Auxillary Input",
     cmd=obd.commands.AUX_INPUT_STATUS,
-    unit="Unkown"
+    unit="Unkown",
+    textToReplace=""
 )
 
 COOLANT_TEMP = ObdData(
     name="Coolant Tempurature",
     cmd=obd.commands.COOLANT_TEMP,
-    unit="Celsius"
+    unit="Celsius",
+    textToReplace=" degree_Celsius"
 )
 
 ENGINE_LOAD = ObdData(
     name="Engine Load",
     cmd=obd.commands.ENGINE_LOAD,
-    unit="Percentage"
+    unit="Percentage",
+    textToReplace=" percent"
 )
 
 FUEL_STATUS = ObdData(
     name="Fuel Status",
     cmd=obd.commands.FUEL_STATUS,
-    unit="Open Loop, Open Loop or Closed Loop, Closed Loop based on temp"
+    unit="Open Loop, Open Loop or Closed Loop, Closed Loop based on temp",
+    textToReplace=""
 )
 
 INTAKE_PRESSURE = ObdData(
     name="Intake Pressure",
     cmd=obd.commands.INTAKE_PRESSURE,
-    unit="kilopascal"
+    unit="kilopascal",
+    textToReplace=" kilopascal"
 )
 
 INTAKE_TEMP = ObdData(
     name="Intake Tempurature",
     cmd=obd.commands.INTAKE_TEMP,
-    unit="Celsius"
+    unit="Celsius",
+    textToReplace=" degree_celsius"
 )
 
 LONG_FUEL_TRIM_1 = ObdData(
     name="Bank 1 Long Fuel Trim",
     cmd=obd.commands.LONG_FUEL_TRIM_1,
-    unit="Percentage"
+    unit="Percentage",
+    textToReplace=" percent"
 )
 
 LONG_FUEL_TRIM_2 = ObdData(
     name="Bank 2 Long Fuel Trim",
     cmd=obd.commands.LONG_FUEL_TRIM_2,
-    unit="Percentage"
+    unit="Percentage",
+    textToReplace=" percent"
 )
 
 MAF = ObdData(
     name="Mass Airflow Sensor",
     cmd=obd.commands.MAF,
-    unit="Grams Per Second"
+    unit="Grams Per Second",
+    textToReplace=" gps"
 )
 
 MIDS_A = ObdData(
     name="MIDS A",
     cmd=obd.commands.MIDS_A,
-    unit="None"
+    unit="None",
+    textToReplace=""
 )
 
 O2_B1S1 = ObdData(
     name="O2 Bank 1 Sensor 1",
     cmd=obd.commands.O2_B1S1,
-    unit="Volts"
+    unit="Volts",
+    textToReplace=" volt"
 )
 
 O2_B1S2 = ObdData(
     name="O2 Bank 1 Sensor 2",
     cmd=obd.commands.O2_B1S2,
-    unit="Volts"
+    unit="Volts",
+    textToReplace=" volt"
 )
 
 O2_B2S1 = ObdData(
     name="O2 Bank 2 Sensor 1",
     cmd=obd.commands.O2_B2S1,
-    unit="Volts"
+    unit="Volts",
+    textToReplace=" volt"
 )
 
 O2_B2S2 = ObdData(
     name="O2 Bank 2 Sensor 2",
     cmd=obd.commands.O2_B2S2,
-    unit="Volts"
+    unit="Volts",
+    textToReplace=" volt"
 )
 
 O2_SENSORS = ObdData(
     name="O2 Sensors Status",
     cmd=obd.commands.O2_SENSORS,
-    unit="(false, false, true, true) (false, false, true, true)"
+    unit="(false, false, true, true) (false, false, true, true)",
+    textToReplace=""
 )
 
 OBD_COMPLIANCE = ObdData(
     name="OBD Compliance",
     cmd=obd.commands.OBD_COMPLIANCE,
-    unit="String"
+    unit="String",
+    textToReplace=""
 )
 
 PIDS_9A = ObdData(
     name="PIDS 9A",
     cmd=obd.commands.PIDS_9A,
-    unit="Bitmask"
+    unit="Bitmask",
+    textToReplace=""
 )
 
 PIDS_A = ObdData(
     name="PIDS A",
     cmd=obd.commands.PIDS_A,
-    unit="Bitmask"
+    unit="Bitmask",
+    textToReplace=""
 )
 
 RPM = ObdData(
     name="RPM",
     cmd=obd.commands.RPM,
-    unit="Revolutions Per Minute"
+    unit="Revolutions Per Minute",
+    textToReplace=" revolutions_per_minute"
 )
 
 SHORT_FUEL_TRIM_1 = ObdData(
     name="Bank 1 Short Fuel Trim",
     cmd=obd.commands.SHORT_FUEL_TRIM_1,
-    unit="Percent"
+    unit="Percent",
+    textToReplace=" percent"
 )
 
 SHORT_FUEL_TRIM_2 = ObdData(
     name="Bank 2 Short Fuel Trim",
     cmd=obd.commands.SHORT_FUEL_TRIM_2,
-    unit="Percent"
+    unit="Percent",
+    textToReplace=" percent"
 )
 
 SPEED = ObdData(
     name="Speed",
     cmd=obd.commands.SPEED,
-    unit="Kilometers Per Hour"
+    unit="Kilometers Per Hour",
+    textToReplace=" kilometer_per_hour"
 )
 
 STATUS = ObdData(
     name="OBD Status",
     cmd=obd.commands.STATUS,
-    unit="Unkown"
+    unit="Unkown",
+    textToReplace=""
 )
 
 THROTTLE_POSITION = ObdData(
     name="Throttle Position",
     cmd=obd.commands.THROTTLE_POS,
-    unit="Unkown"
+    unit="Unkown",
+    textToReplace=" percent"
 )
 
 TIMING_ADVANCE = ObdData(
     name="Timing Advance",
     cmd=obd.commands.TIMING_ADVANCE,
-    unit="Degrees"
+    unit="Degrees",
+    textToReplace=" degree"
 )
 # maybe display this on startup
 VERSION = ObdData(
     name="Firmware Version",
     cmd=obd.commands.ELM_VERSION,
-    unit="String"
+    unit="String",
+    textToReplace=""
 )
 
 VOLTAGE = ObdData(
     name="Voltage",
     cmd=obd.commands.ELM_VOLTAGE,
-    unit="Volts"
+    unit="Volts",
+    textToReplace=" volt"
 )
 
 all_data = [
