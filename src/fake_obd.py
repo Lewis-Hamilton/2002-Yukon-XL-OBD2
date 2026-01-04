@@ -93,7 +93,7 @@ class FakeOBD:
         elif command.name == "INTAKE_TEMP":
             return FakeOBDResponse(f"{random.uniform(0, 115)} degree_celsius")
         elif command.name == "ENGINE_LOAD":
-            return FakeOBDResponse(f"{round(random.randint(0.0, 99.9), 15)} percent")
+            return FakeOBDResponse(f"{round(random.uniform(0.0, 99.9), 15)} percent")
         elif command.name == "AUX_INPUT_STATUS":
             return FakeOBDResponse(random.choice([0, 1]))
         elif command.name in ["O2_B1S1", "O2_B1S2", "O2_B2S1", "O2_B2S2"]:
