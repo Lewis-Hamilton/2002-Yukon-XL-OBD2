@@ -37,7 +37,10 @@ try:
     now = datetime.now()
 
     current_date = now.date()
-    initial_csv_name = f"./logged_data/{current_date}.csv"
+    if args.testing == True:
+        initial_csv_name = f"./logged_data/test-data-{current_date}.csv"
+    else:
+        initial_csv_name = f"./logged_data/{current_date}.csv"
     csv_name = get_filename(initial_csv_name)
     column_names = [data.name for data in all_data]
     column_names.insert(0, "Time")
