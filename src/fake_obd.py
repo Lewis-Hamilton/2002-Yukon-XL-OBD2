@@ -23,7 +23,7 @@ class FakeOBDResponse:
     def __repr__(self):
         if self._is_null:
             return f"<FakeOBDResponse: NULL>"
-        return f"<FakeOBDResponse: {self.value}>"
+        return self.value
 
 # --- Mimic obd.commands ---
 class FakeOBDCommands:
@@ -75,8 +75,6 @@ class FakeOBD:
         if not self._is_connected:
             return FakeOBDResponse(None, is_null=True)
 
-        print(f"FakeOBD: Querying {command.name}...", end="\r")
-
         # Simulate different responses for different commands
         if command.name == "RPM":
             num = random.uniform(600, 7000)
@@ -91,31 +89,31 @@ class FakeOBD:
         elif command.name == "ELM_VOLTAGE":
             return FakeOBDResponse(f"{round(random.uniform(11.0, 15), 1)} volt")
         elif command.name == "THROTTLE_POS":
-            return FakeOBDResponse(round(random.uniform(0.0, 99.9), 1))
+            return FakeOBDResponse(f"{round(random.uniform(0.0, 99.9), 15)} percent")
         elif command.name == "INTAKE_TEMP":
-            return FakeOBDResponse(round(random.uniform(20.0, 50.0), 1))
+            return FakeOBDResponse(f"{random.uniform(0, 115)} degree_celsius")
         elif command.name == "ENGINE_LOAD":
-            return FakeOBDResponse(round(random.uniform(10.0, 80.0), 1))
+            return FakeOBDResponse(f"{round(random.randint(0.0, 99.9), 15)} percent")
         elif command.name == "AUX_INPUT_STATUS":
             return FakeOBDResponse(random.choice([0, 1]))
         elif command.name in ["O2_B1S1", "O2_B1S2", "O2_B2S1", "O2_B2S2"]:
-            return FakeOBDResponse(round(random.uniform(0.1, 0.9), 2))
+            return FakeOBDResponse(f"{round(random.uniform(0.1, 0.9), 2)} volt")
         elif command.name == "O2_SENSORS":
             return FakeOBDResponse("B1S1, B1S2, B2S1, B2S2")
         elif command.name == "TIMING_ADVANCE":
-            return FakeOBDResponse(round(random.uniform(-15.0, 25.0), 1))
+            return FakeOBDResponse(f"{round(random.uniform(0, 60), 1)} degree")
         elif command.name == "ELM_VERSION":
             return FakeOBDResponse("ELM327 v1.5 (Fake)")
         elif command.name == "MAF":
-            return FakeOBDResponse(round(random.uniform(2.0, 200.0), 2))
+            return FakeOBDResponse(f"{round(random.uniform(10.0, 81.0), 15)} gps")
         elif command.name == "INTAKE_PRESSURE":
-            return FakeOBDResponse(random.randint(20, 100))
+            return FakeOBDResponse(f"{random.randint(20, 100)} kilopascal")
         elif command.name in ["SHORT_FUEL_TRIM_1", "SHORT_FUEL_TRIM_2"]:
-            return FakeOBDResponse(round(random.uniform(-10.0, 10.0), 2))
+            return FakeOBDResponse(f"{round(random.uniform(-10.0, 10.0), 5)} percent")
         elif command.name in ["LONG_FUEL_TRIM_1", "LONG_FUEL_TRIM_2"]:
-            return FakeOBDResponse(round(random.uniform(-5.0, 5.0), 2))
+            return FakeOBDResponse(f"{round(random.uniform(1.0, 20.0), 5)} percent")
         elif command.name == "FUEL_STATUS":
-            statuses = ["Closed loop", "Open loop"]
+            statuses = ["('Closed loop, using oxygen sensor feedback to determine fuel mix', 'Closed loop, using oxygen sensor feedback to determine fuel mix')", "('Open loop due to insufficient engine temperature', 'Open loop due to insufficient engine temperature')"]
             return FakeOBDResponse(random.choice(statuses))
         elif command.name == "STATUS":
             return FakeOBDResponse("Monitor Status")
