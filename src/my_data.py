@@ -12,7 +12,7 @@ else:
 
 
 class ObdData:
-    def __init__(self, name, cmd, unit, textToReplace):
+    def __init__(self, name, cmd, unit, textToReplace = None):
         self.name = name
         self.cmd = cmd
         self.unit = unit
@@ -21,13 +21,18 @@ class ObdData:
     @property 
     def response(self):
         myresponse = connection.query(self.cmd)
-        return myresponse
+        if self.textToReplace is not None:
+            stringResponse = str(myresponse)
+            cleanedResponse = stringResponse.replace(self.textToReplace, "")
+            floatResponse = float(cleanedResponse)
+            return floatResponse
+        else: 
+            return myresponse
 
 AUX_INPUT_STATUS = ObdData(
     name="Auxillary Input",
     cmd=obd.commands.AUX_INPUT_STATUS,
     unit="Unkown",
-    textToReplace=""
 )
 
 COOLANT_TEMP = ObdData(
@@ -48,7 +53,6 @@ FUEL_STATUS = ObdData(
     name="Fuel Status",
     cmd=obd.commands.FUEL_STATUS,
     unit="Open Loop, Open Loop or Closed Loop, Closed Loop based on temp",
-    textToReplace=""
 )
 
 INTAKE_PRESSURE = ObdData(
@@ -90,7 +94,6 @@ MIDS_A = ObdData(
     name="MIDS A",
     cmd=obd.commands.MIDS_A,
     unit="None",
-    textToReplace=""
 )
 
 O2_B1S1 = ObdData(
@@ -125,28 +128,24 @@ O2_SENSORS = ObdData(
     name="O2 Sensors Status",
     cmd=obd.commands.O2_SENSORS,
     unit="(false, false, true, true) (false, false, true, true)",
-    textToReplace=""
 )
 
 OBD_COMPLIANCE = ObdData(
     name="OBD Compliance",
     cmd=obd.commands.OBD_COMPLIANCE,
     unit="String",
-    textToReplace=""
 )
 
 PIDS_9A = ObdData(
     name="PIDS 9A",
     cmd=obd.commands.PIDS_9A,
     unit="Bitmask",
-    textToReplace=""
 )
 
 PIDS_A = ObdData(
     name="PIDS A",
     cmd=obd.commands.PIDS_A,
-    unit="Bitmask",
-    textToReplace=""
+    unit="Bitmask", 
 )
 
 RPM = ObdData(
@@ -181,7 +180,6 @@ STATUS = ObdData(
     name="OBD Status",
     cmd=obd.commands.STATUS,
     unit="Unkown",
-    textToReplace=""
 )
 
 THROTTLE_POSITION = ObdData(
@@ -201,8 +199,7 @@ TIMING_ADVANCE = ObdData(
 VERSION = ObdData(
     name="Firmware Version",
     cmd=obd.commands.ELM_VERSION,
-    unit="String",
-    textToReplace=""
+    unit="String", 
 )
 
 VOLTAGE = ObdData(
