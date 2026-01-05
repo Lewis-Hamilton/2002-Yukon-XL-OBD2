@@ -42,7 +42,7 @@ try:
     else:
         initial_csv_name = f"./logged_data/{current_date}.csv"
     csv_name = get_filename(initial_csv_name)
-    column_names = [data.name for data in all_data]
+    column_names = [f"{data.name} ({data.unit})" for data in all_data]
     column_names.insert(0, "Time")
 
     with open (csv_name, "w", newline="") as csvfile:
@@ -56,7 +56,7 @@ try:
                 data_row = {"Time": then.time()}
 
                 for data in all_data:
-                    data_row[data.name] = data.response
+                    data_row[f"{data.name} ({data.unit})"] = data.response
                     if data.name == "RPM":
                         rpm_response = str(data.response)
                         new_rpm = rpm_response.replace(" revolutions_per_minute", "")
