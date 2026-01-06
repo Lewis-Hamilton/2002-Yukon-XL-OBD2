@@ -58,23 +58,17 @@ try:
                 for data in all_data:
                     data_row[f"{data.name} ({data.unit})"] = data.response
                     if data.name == "RPM":
-                        rpm_response = str(data.response)
-                        new_rpm = rpm_response.replace(" revolutions_per_minute", "")
-                        rpm_num = float(new_rpm)
+                        rpm_num = data.response
                         if rpm_num > 850:
-                           print("Engine Speed: Not Ready")
+                           print("Idle too high")
                         if rpm_num <= 850:
-                           print("Engine Speed: Ready")
-                    # This doesn't work yet
-                    # if data.name == "COOLANT_TEMP":
-                    #     coolant_response = str(data.response)
-                    #     new_coolant = coolant_response.replace(" degree_Celsius", "")
-                    #     coolant_num = int(new_coolant)
-                    #     if coolant_num < 88:
-                    #         print("Coolant Temp: Not Ready")
-                    #     if coolant_num >= 88:
-                    #         print("Coolant Temp: Ready")
-
+                           print("Idle dropped")
+                    if data.name == "Coolant Tempurature":
+                        coolantF = data.response
+                        if coolantF < 195:
+                            print("Coolant Cold")
+                        if coolantF >= 195:
+                            print("Coolant Warm")
                 thewriter.writerow(data_row)
                 time.sleep(1)
 
