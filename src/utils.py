@@ -42,3 +42,11 @@ def convert_to_number(dirty_string):
     except ValueError:
         print(f"Error: Could not convert '{cleaned_string}' to a number.")
         return None
+
+def create_logging_dir():
+    if os.path.exists("./logged_data"):
+        print("Logging directory exists")
+    else:
+        print("Logging directory does not exist, creating now")   
+        os.mkdir("./logged_data")
+    return None

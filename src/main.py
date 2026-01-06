@@ -3,7 +3,7 @@ import time
 import csv
 import os
 from args import parser
-from utils import check_connection, celsius_to_fahrenheit, convert_to_number, get_filename
+from utils import check_connection, celsius_to_fahrenheit, convert_to_number, get_filename, create_logging_dir
 from my_data import all_data
 from datetime import datetime
 
@@ -27,12 +27,7 @@ try:
 
     check_connection(connection)
 
-# move this to util function
-    if os.path.exists("./logged_data"):
-        print("Logging directory exists")
-    else:
-        print("Logging directory does not exist, creating now")   
-        os.mkdir("./logged_data") 
+    create_logging_dir()
 
     now = datetime.now()
 
