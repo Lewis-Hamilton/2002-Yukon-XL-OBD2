@@ -10,13 +10,18 @@ else:
     import obd
     connection = obd.OBD(portstr="/dev/ttyUSB0")
 
+class Conversion:
+    def __init__(self, amount, offset = 0):
+        self.amount = amount
+        self.offset = offset
 
 class ObdData:
-    def __init__(self, name, cmd, unit, textToReplace = None):
+    def __init__(self, name, cmd, unit, textToReplace = None, conversion = None,):
         self.name = name
         self.cmd = cmd
         self.unit = unit
         self.textToReplace = textToReplace
+        self.conversion = conversion
     
     @property 
     def response(self):
@@ -24,8 +29,12 @@ class ObdData:
         if self.textToReplace is not None:
             stringResponse = str(myresponse)
             cleanedResponse = stringResponse.replace(self.textToReplace, "")
-            floatResponse = float(cleanedResponse)
-            return floatResponse
+            unConvertedResponse = float(cleanedResponse)
+            if self.conversion is not None:
+                convertedResponse = unConvertedResponse * self.conversion.amount + self.conversion.offset
+                return round(convertedResponse)
+            else:
+                return round(unConvertedResponse)
         else: 
             return myresponse
 
@@ -38,9 +47,10 @@ AUX_INPUT_STATUS = ObdData(
 COOLANT_TEMP = ObdData(
     name="Coolant Tempurature",
     cmd=obd.commands.COOLANT_TEMP,
-    unit="Celsius",
-    textToReplace=" degree_Celsius"
-)
+    unit="Fahrenheit",
+    textToReplace=" degree_Celsius",
+    conversion = Conversion(amount= 1.8, offset= 32) 
+    )
 
 ENGINE_LOAD = ObdData(
     name="Engine Load",
@@ -172,8 +182,9 @@ SHORT_FUEL_TRIM_2 = ObdData(
 SPEED = ObdData(
     name="Speed",
     cmd=obd.commands.SPEED,
-    unit="Kilometers Per Hour",
-    textToReplace=" kilometer_per_hour"
+    unit="MPH",
+    textToReplace=" kilometer_per_hour",
+    conversion= Conversion(amount= 0.621371)
 )
 
 STATUS = ObdData(
@@ -185,7 +196,7 @@ STATUS = ObdData(
 THROTTLE_POSITION = ObdData(
     name="Throttle Position",
     cmd=obd.commands.THROTTLE_POS,
-    unit="Unkown",
+    unit="Percent",
     textToReplace=" percent"
 )
 
