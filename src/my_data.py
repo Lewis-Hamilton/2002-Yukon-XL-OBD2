@@ -75,8 +75,9 @@ INTAKE_PRESSURE = ObdData(
 INTAKE_TEMP = ObdData(
     name="Intake Tempurature",
     cmd=obd.commands.INTAKE_TEMP,
-    unit="Celsius",
-    textToReplace=" degree_celsius"
+    unit="Fahrenheit",
+    textToReplace=" degree_Celsius",
+    conversion = Conversion(amount= 1.8, offset= 32) 
 )
 
 LONG_FUEL_TRIM_1 = ObdData(
