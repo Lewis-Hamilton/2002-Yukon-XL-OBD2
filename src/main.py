@@ -51,7 +51,8 @@ try:
                 data_row = {"Time": then.time()}
 
                 for data in all_data:
-                    data_row[f"{data.name} ({data.unit})"] = data.response
+                    response = data.response(connection)
+                    data_row[f"{data.name} ({data.unit})"] = response
                     if data.name == "RPM":
                         rpm_num = data.response
                         if rpm_num > 850:

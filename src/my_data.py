@@ -2,13 +2,6 @@ from args import parser
 
 args = parser.parse_args()
 
-if args.testing == True:
-    import fake_obd as obd
-    connection = obd.FakeOBD()
-
-else:
-    import obd
-    connection = obd.OBD(portstr="/dev/ttyUSB0")
 
 class Conversion:
     def __init__(self, amount, offset = 0):
@@ -23,8 +16,7 @@ class ObdData:
         self.textToReplace = textToReplace
         self.conversion = conversion
     
-    @property 
-    def response(self):
+    def response(self, connection):
         myresponse = connection.query(self.cmd)
         if self.textToReplace is not None:
             stringResponse = str(myresponse)
