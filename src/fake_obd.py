@@ -25,8 +25,13 @@ class FakeOBDResponse:
             return f"<FakeOBDResponse: NULL>"
         return self.value
 
+        # fake obd error
+        # AttributeError: 'FakeOBD' object has no attribute 'supported_commands'
+        # if this trans temp works, will need to add that, need to test with real yukon
+
 # --- Mimic obd.commands ---
 class FakeOBDCommands:
+    # TRANS_TEMP = FakeOBDCommand("TRANS_TEMP")
     AUX_INPUT_STATUS = FakeOBDCommand("AUX_INPUT_STATUS")
     COOLANT_TEMP = FakeOBDCommand("COOLANT_TEMP")
     ENGINE_LOAD = FakeOBDCommand("ENGINE_LOAD")
@@ -81,6 +86,8 @@ class FakeOBD:
             decimals = random.choice([1, 2])
             rpm = round(num, decimals)
             return FakeOBDResponse(f"{rpm} revolutions_per_minute")
+        # elif command.name == "Transmission Tempurature":
+        #     return FakeOBDResponse(f"{random.randint(0, 115)} degree_Celsius")
         elif command.name == "SPEED":
             return FakeOBDResponse(f"{random.randint(0, 160)}.0 kilometer_per_hour")
         elif command.name == "COOLANT_TEMP":
