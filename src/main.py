@@ -51,8 +51,22 @@ try:
                 data_row = {"Time": then.time()}
 
                 for data in all_data:
-                    response = data.response(connection)
-                    data_row[f"{data.name} ({data.unit})"] = response
+                    currentValue = data.response
+                    data_row[f"{data.name} ({data.unit})"] = currentValue
+
+                    if data.name == "RPM":
+                        rpm_num = currentValue
+                        if rpm_num > 850:
+                           print("Idle too high")
+                        if rpm_num <= 850:
+                           print("Idle dropped")
+                    if data.name == "Coolant Tempurature":
+                        coolantF = currentValue
+                        if coolantF < 195:
+                            print("Coolant Cold")
+                        if coolantF >= 195:
+                            print("Coolant Warm")
+
                 thewriter.writerow(data_row)
                 csvfile.flush()
                 time.sleep(1)
