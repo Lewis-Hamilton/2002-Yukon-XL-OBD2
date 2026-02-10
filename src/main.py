@@ -6,6 +6,7 @@ from args import parser
 from utils import check_connection, celsius_to_fahrenheit, convert_to_number, get_filename, create_logging_dir
 from my_data import all_data
 from datetime import datetime
+# from trans_temp import TRANS_TEMP_GM
 
 args = parser.parse_args()
 
@@ -27,7 +28,17 @@ try:
 
     check_connection(connection)
 
+    # add trans temp
+    # connection.supported_commands.add(TRANS_TEMP_GM)
+
     create_logging_dir()
+
+    # if not args.testing:
+    #     # Force the adapter to use GM's J1850 VPW protocol
+    #     # and turn off automatic formatting which can hide data
+    #     connection.interface.write(b"AT SP 2\r") # Force Protocol 2 (VPW)
+    #     connection.interface.write(b"AT AL\r")   # Allow Long messages
+    #     connection.interface.write(b"AT H1\r")   # Show Headers in responses
 
     now = datetime.now()
 
@@ -46,6 +57,12 @@ try:
         print(f"Logging data to '{csv_name}'...")
 
         while True:
+
+            # try to get trans temp
+            # transResponse = connection.query(TRANS_TEMP_GM)
+            # print(transResponse)
+            # print(transResponse.value.to("fahrenheit"))
+
             try:
                 then = datetime.now()
                 data_row = {"Time": then.time()}
