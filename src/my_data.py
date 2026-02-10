@@ -1,4 +1,5 @@
 from args import parser
+import obd
 
 args = parser.parse_args()
 
