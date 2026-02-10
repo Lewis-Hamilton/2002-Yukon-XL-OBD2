@@ -76,7 +76,7 @@ INTAKE_TEMP = ObdData(
     name="Intake Tempurature",
     cmd=obd.commands.INTAKE_TEMP,
     unit="Celsius",
-    textToReplace=" degree_celsius"
+    textToReplace=" degree_Celsius"
 )
 
 LONG_FUEL_TRIM_1 = ObdData(
