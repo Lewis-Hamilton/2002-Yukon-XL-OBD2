@@ -30,6 +30,13 @@ class ObdData:
         else: 
             return myresponse
 
+# TRANS_TEMP = ObdData(
+#     name="Transmission Tempurature",
+#     cmd=TRANS_TEMP_GM,
+#     unit="Fahrenheit",
+#     # conversion=Conversion(amount=1.8, offset=32) # Convert C to F
+# )
+
 AUX_INPUT_STATUS = ObdData(
     name="Auxillary Input",
     cmd=obd.commands.AUX_INPUT_STATUS,
