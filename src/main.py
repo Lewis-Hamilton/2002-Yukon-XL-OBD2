@@ -51,20 +51,24 @@ try:
                 data_row = {"Time": then.time()}
 
                 for data in all_data:
-                    data_row[f"{data.name} ({data.unit})"] = data.response
+                    currentValue = data.response
+                    data_row[f"{data.name} ({data.unit})"] = currentValue
+
                     if data.name == "RPM":
-                        rpm_num = data.response
+                        rpm_num = currentValue
                         if rpm_num > 850:
                            print("Idle too high")
                         if rpm_num <= 850:
                            print("Idle dropped")
                     if data.name == "Coolant Tempurature":
-                        coolantF = data.response
+                        coolantF = currentValue
                         if coolantF < 195:
                             print("Coolant Cold")
                         if coolantF >= 195:
                             print("Coolant Warm")
+
                 thewriter.writerow(data_row)
+                csvfile.flush()
                 time.sleep(1)
 
             except KeyboardInterrupt:
