@@ -63,6 +63,30 @@ def draw_voltage_gauge(screen, voltage_value, font_small):
     voltage_text = font_small.render(f"Voltage: {voltage_value}V", True, (255, 255, 0))
     screen.blit(voltage_text, (20, 280))
 
+
+def draw_gear_gauge(screen, gear_value, font_large):
+    """
+    Draw estimated gear display.
+    
+    Args:
+        screen: Pygame screen object
+        gear_value: Estimated gear string (e.g., "3rd", "4th (OD)")
+        font_large: Large font for gear display
+    """
+    # Color coding: Green for normal driving gears, Yellow for 1st/overdrive
+    if gear_value in ["2nd", "3rd"]:
+        gear_color = (0, 255, 0)  # Green
+    elif gear_value == "1st":
+        gear_color = (255, 255, 0)  # Yellow
+    elif gear_value == "4th (OD)":
+        gear_color = (0, 200, 255)  # Light blue for overdrive
+    else:
+        gear_color = (150, 150, 150)  # Gray for N/P or unknown
+    
+    gear_text = font_large.render(f"Gear: {gear_value}", True, gear_color)
+    screen.blit(gear_text, (240, 200))
+
+
 def render_display(screen, data_store, font_large, font_small):
     """
     Main rendering function - draws all gauges on screen.
@@ -82,13 +106,15 @@ def render_display(screen, data_store, font_large, font_small):
     coolant_value = data_store.get('Coolant Temperature', 0)
     throttle_value = data_store.get('Throttle Position', 0)
     voltage_value = data_store.get('Voltage', 0)
-
+    gear_value = data_store.get('Estimated Gear', '---')
+    
     # Draw all gauges
     draw_rpm_gauge(screen, rpm_value, font_large)
     draw_speed_gauge(screen, speed_value, font_small)
     draw_coolant_gauge(screen, coolant_value, font_small)
     draw_throttle_gauge(screen, throttle_value, font_small)
     draw_voltage_gauge(screen, voltage_value, font_small)
+    draw_gear_gauge(screen, gear_value, font_large)
     
     # Update display
     pygame.display.flip()

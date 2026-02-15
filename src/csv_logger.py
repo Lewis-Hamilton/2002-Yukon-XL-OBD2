@@ -25,6 +25,7 @@ def csv_logger(csv_queue, all_data, args):
     csv_name = get_filename(initial_csv_name)
     column_names = [f"{data.name} ({data.unit})" for data in all_data]
     column_names.insert(0, "Time")
+    column_names.append("Estimated Gear")  # Add gear estimate column
     
     with open(csv_name, "w", newline="") as csvfile:
         thewriter = csv.DictWriter(csvfile, fieldnames=column_names)

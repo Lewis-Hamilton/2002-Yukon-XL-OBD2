@@ -1,5 +1,6 @@
 import time
 from datetime import datetime
+from calculations import estimate_gear
 
 def obd_worker(connection, all_data, data_store, csv_queue):
     """
@@ -39,12 +40,21 @@ def obd_worker(connection, all_data, data_store, csv_queue):
                     data_store[data.name] = val
                     last_update_times[data.name] = current_time
             
+            # Calculate estimated gear based on RPM and Speed
+            rpm = data_store.get("RPM", 0)
+            speed = data_store.get("Speed", 0)
+            engine_load = data_store.get("Engine Load", None)
+            data_store["Estimated Gear"] = estimate_gear(rpm, speed, engine_load)
+            
             # Write to CSV every 1 second
             if current_time - last_csv_write >= 1.0:
                 data_row = {"Time": datetime.now().time()}
                 
                 for data in all_data:
                     data_row[f"{data.name} ({data.unit})"] = data_store.get(data.name, 0)
+                
+                # Add estimated gear to CSV
+                data_row["Estimated Gear"] = data_store.get("Estimated Gear", "---")
                 
                 csv_queue.put(data_row)  # Send to CSV thread
                 last_csv_write = current_time
