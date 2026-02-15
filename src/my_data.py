@@ -47,7 +47,7 @@ AUX_INPUT_STATUS = ObdData(
 )
 
 COOLANT_TEMP = ObdData(
-    name="Coolant Tempurature",
+    name="Coolant Temperature",
     cmd=obd.commands.COOLANT_TEMP,
     unit="Fahrenheit",
     priority="fast",
@@ -79,7 +79,7 @@ INTAKE_PRESSURE = ObdData(
 )
 
 INTAKE_TEMP = ObdData(
-    name="Intake Tempurature",
+    name="Intake Temperature",
     cmd=obd.commands.INTAKE_TEMP,
     unit="Celsius",
     priority="fast",
