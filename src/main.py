@@ -1,14 +1,13 @@
 import sys
 import time
-import csv
-import os
 import queue
-from args import parser
-from utils import check_connection, celsius_to_fahrenheit, convert_to_number, get_filename, create_logging_dir
-from my_data import all_data
-from datetime import datetime
 import pygame
 import threading
+from args import parser
+from utils import check_connection
+from my_data import all_data
+from obd_worker import obd_worker
+from csv_logger import csv_logger
 
 # Import obd based on testing vs real world
 args = parser.parse_args()
@@ -37,96 +36,20 @@ try:
     # Queue for passing data from OBD thread to CSV thread
     csv_queue = queue.Queue()
 
-    def csv_logger():
-        """Separate thread that writes data to CSV"""
-        create_logging_dir()
-        
-        now = datetime.now()
-        current_date = now.date()
-        
-        if args.testing == True:
-            initial_csv_name = f"./logged_data/test-data-{current_date}.csv"
-        else:
-            initial_csv_name = f"./logged_data/{current_date}.csv"
-        
-        csv_name = get_filename(initial_csv_name)
-        column_names = [f"{data.name} ({data.unit})" for data in all_data]
-        column_names.insert(0, "Time")
-        
-        with open(csv_name, "w", newline="") as csvfile:
-            thewriter = csv.DictWriter(csvfile, fieldnames=column_names)
-            thewriter.writeheader()
-            print(f"Logging data to '{csv_name}'...")
-            
-            while True:
-                try:
-                    # Wait for data from the queue (blocks until data available)
-                    data_row = csv_queue.get(timeout=1)
-                    
-                    if data_row is None:  # Poison pill to stop the thread
-                        print("CSV logger stopping...")
-                        break
-                    
-                    thewriter.writerow(data_row)
-                    csvfile.flush()  # Make sure it's written to disk immediately
-                    
-                except queue.Empty:
-                    # No data in queue, just continue
-                    continue
-                except Exception as e:
-                    print(f"CSV Thread Error: {e}")
-                    time.sleep(1)
-
-    def obd_worker():
-        """OBD worker thread that queries sensors based on priority"""
-        # Track when each sensor was last updated
-        last_update_times = {data.name: 0 for data in all_data}
-        last_csv_write = 0
-        
-        # Define update intervals for each priority (in seconds)
-        priority_intervals = {
-            "fast": 0.5,    # Update twice per second, increase time if errors
-            "medium": 2.0,  # Update every 2 seconds
-            "slow": 10.0    # Update every 10 seconds
-        }
-        
-        while True:
-            try:
-                current_time = time.time()
-                
-                # Update sensors based on their priority
-                for data in all_data:
-                    time_since_update = current_time - last_update_times[data.name]
-                    interval = priority_intervals.get(data.priority, 5.0)
-                    
-                    # Should we update this sensor now?
-                    if time_since_update >= interval:
-                        val = data.response  # Query the car
-                        data_store[data.name] = val
-                        last_update_times[data.name] = current_time
-                
-                # Write to CSV every 1 second
-                if current_time - last_csv_write >= 1.0:
-                    data_row = {"Time": datetime.now().time()}
-                    
-                    for data in all_data:
-                        data_row[f"{data.name} ({data.unit})"] = data_store.get(data.name, 0)
-                    
-                    csv_queue.put(data_row)  # Send to CSV thread
-                    last_csv_write = current_time
-                
-                time.sleep(0.05)  # Small sleep to prevent CPU hammering
-                
-            except Exception as e:
-                print(f"OBD Thread Error: {e}")
-                time.sleep(1)
-
     # Start OBD Thread
-    obd_thread = threading.Thread(target=obd_worker, daemon=True)
+    obd_thread = threading.Thread(
+        target=obd_worker, 
+        args=(connection, all_data, data_store, csv_queue),
+        daemon=True
+    )
     obd_thread.start()
     
     # Start CSV Thread
-    csv_thread = threading.Thread(target=csv_logger, daemon=True)
+    csv_thread = threading.Thread(
+        target=csv_logger,
+        args=(csv_queue, all_data, args),
+        daemon=True
+    )
     csv_thread.start()
 
     # Initialize Pygame
@@ -135,6 +58,8 @@ try:
     font_large = pygame.font.SysFont("Arial", 60)
     font_small = pygame.font.SysFont("Arial", 30)
     clock = pygame.time.Clock()
+
+    print("Display started - press X to quit")
 
     running = True
     while running:
