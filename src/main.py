@@ -60,7 +60,7 @@ try:
     font_small = pygame.font.SysFont("Arial", 30)
     clock = pygame.time.Clock()
 
-    print("Display started - press X to quit")
+    print("Display started - press Ctrl+C to quit")
 
     running = True
     while running:
