@@ -8,6 +8,7 @@ from utils import check_connection
 from my_data import all_data
 from obd_worker import obd_worker
 from csv_logger import csv_logger
+from display import render_display
 
 # Import obd based on testing vs real world
 args = parser.parse_args()
@@ -63,40 +64,16 @@ try:
 
     running = True
     while running:
+        # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        screen.fill((0, 0, 0))  # Black background
-
-        # Draw RPM (Digital)
-        rpm_value = data_store.get('RPM', 0)
-        rpm_text = font_large.render(f"RPM: {rpm_value}", True, (0, 255, 0))
-        screen.blit(rpm_text, (20, 20))
+        # Render all gauges
+        render_display(screen, data_store, font_large, font_small)
         
-        # Draw RPM shift bar
-        bar_width = min((rpm_value / 6000) * 400, 400)  # Cap at 400px
-        bar_color = (255, 0, 0) if rpm_value > 5000 else (0, 255, 0)
-        pygame.draw.rect(screen, bar_color, (40, 100, bar_width, 40))
-        
-        # Draw Speed
-        speed_value = data_store.get('Speed', 0)
-        speed_text = font_small.render(f"Speed: {speed_value} MPH", True, (255, 255, 0))
-        screen.blit(speed_text, (20, 160))
-        
-        # Draw Coolant Temperature
-        coolant_value = data_store.get('Coolant Temperature', 0)
-        coolant_color = (0, 255, 255) if coolant_value < 195 else (255, 100, 0)
-        coolant_text = font_small.render(f"Coolant: {coolant_value}°F", True, coolant_color)
-        screen.blit(coolant_text, (20, 200))
-        
-        # Draw Throttle Position
-        throttle_value = data_store.get('Throttle Position', 0)
-        throttle_text = font_small.render(f"Throttle: {throttle_value}%", True, (255, 255, 255))
-        screen.blit(throttle_text, (20, 240))
-
-        pygame.display.flip()
-        clock.tick(30)  # Limit to 30 FPS
+        # Limit to 30 FPS
+        clock.tick(30)
 
 except KeyboardInterrupt:
     print("\nStopping...")
