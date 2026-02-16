@@ -55,7 +55,7 @@ try:
 
     # Initialize Pygame
     pygame.init()
-    screen = pygame.display.set_mode((480, 320))  # Typical 3.5" display size
+    screen = pygame.display.set_mode((800, 800))  # Typical 3.5" display size
     font_large = pygame.font.SysFont("Arial", 60)
     font_small = pygame.font.SysFont("Arial", 30)
     clock = pygame.time.Clock()

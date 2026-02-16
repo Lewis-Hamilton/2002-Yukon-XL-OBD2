@@ -1,6 +1,6 @@
 import pygame
 
-def draw_rpm_gauge(screen, rpm_value, font_large):
+def draw_rpm_gauge(screen, rpm_value, font_small):
     """
     Draw RPM digital readout and shift bar.
     
@@ -10,13 +10,22 @@ def draw_rpm_gauge(screen, rpm_value, font_large):
         font_large: Large font for RPM display
     """
     # Draw RPM number
-    rpm_text = font_large.render(f"RPM: {rpm_value}", True, (0, 255, 0))
+    rpm_text = font_small.render(f"RPM: {rpm_value}", True, (255, 255, 255))
     screen.blit(rpm_text, (20, 20))
     
+    bar_color = (0, 255, 0)
+
+    if rpm_value <= 800:
+        bar_color = (13, 255, 240)
+    elif rpm_value > 800 and rpm_value <= 5000:
+        bar_color = (0, 255, 0)
+    else:
+        bar_color = (255, 0, 0)
+
     # Draw RPM shift bar
     bar_width = min((rpm_value / 6000) * 400, 400)  # Cap at 400px
-    bar_color = (255, 0, 0) if rpm_value > 5000 else (0, 255, 0)
-    pygame.draw.rect(screen, bar_color, (40, 100, bar_width, 40))
+    # bar_color = (255, 0, 0) if rpm_value > 5000 else (0, 255, 0)
+    pygame.draw.rect(screen, bar_color, (40, 70, bar_width, 40))
 
 
 def draw_speed_gauge(screen, speed_value, font_small):
@@ -57,14 +66,26 @@ def draw_throttle_gauge(screen, throttle_value, font_small):
         font_small: Small font for throttle display
     """
     throttle_text = font_small.render(f"Throttle: {throttle_value}%", True, (255, 255, 255))
-    screen.blit(throttle_text, (20, 240))
+    screen.blit(throttle_text, (20, 120))
+
+    bar_width = min((throttle_value / 100) * 780, 780)  # Cap at 400px
+    bar_color = (255, 0, 0) if throttle_value > 50 else (0, 255, 0)
+    pygame.draw.rect(screen, bar_color, (40, 170, bar_width, 40))
+
+def draw_load_gauge(screen, load_value, font_small):
+    load_text = font_small.render(f"Engine Load: {load_value}%", True, (255, 255, 255))
+    screen.blit(load_text, (20, 220))
+
+    bar_width = min((load_value / 100) * 780, 780)  # Cap at 400px
+    bar_color = (255, 0, 0) if load_value > 50 else (0, 255, 0)
+    pygame.draw.rect(screen, bar_color, (40, 270, bar_width, 40))
 
 def draw_voltage_gauge(screen, voltage_value, font_small):
     voltage_text = font_small.render(f"Voltage: {voltage_value}V", True, (255, 255, 0))
     screen.blit(voltage_text, (20, 280))
 
 
-def draw_gear_gauge(screen, gear_value, font_large):
+def draw_gear_gauge(screen, gear_value, font_small):
     """
     Draw estimated gear display.
     
@@ -83,8 +104,8 @@ def draw_gear_gauge(screen, gear_value, font_large):
     else:
         gear_color = (150, 150, 150)  # Gray for N/P or unknown
     
-    gear_text = font_large.render(f"Gear: {gear_value}", True, gear_color)
-    screen.blit(gear_text, (240, 200))
+    gear_text = font_small.render(f"Gear: {gear_value}", True, gear_color)
+    screen.blit(gear_text, (20, 320))
 
 
 def render_display(screen, data_store, font_large, font_small):
@@ -107,14 +128,16 @@ def render_display(screen, data_store, font_large, font_small):
     throttle_value = data_store.get('Throttle Position', 0)
     voltage_value = data_store.get('Voltage', 0)
     gear_value = data_store.get('Estimated Gear', '---')
+    load_value = data_store.get('Engine Load', 0)
     
     # Draw all gauges
-    draw_rpm_gauge(screen, rpm_value, font_large)
-    draw_speed_gauge(screen, speed_value, font_small)
-    draw_coolant_gauge(screen, coolant_value, font_small)
+    draw_rpm_gauge(screen, rpm_value, font_small)
+    # draw_speed_gauge(screen, speed_value, font_small)
+    # draw_coolant_gauge(screen, coolant_value, font_small)
     draw_throttle_gauge(screen, throttle_value, font_small)
-    draw_voltage_gauge(screen, voltage_value, font_small)
-    draw_gear_gauge(screen, gear_value, font_large)
+    # draw_voltage_gauge(screen, voltage_value, font_small)
+    draw_gear_gauge(screen, gear_value, font_small)
+    draw_load_gauge(screen, load_value, font_small)
     
     # Update display
     pygame.display.flip()
