@@ -10,6 +10,11 @@ from obd_worker import obd_worker
 from csv_logger import csv_logger
 from display import render_display
 
+# Add this temporarily at the top of main.py to see what driver pygame picked
+import pygame
+pygame.init()
+print(f"Video driver: {pygame.display.get_driver()}")
+
 # Import obd based on testing vs real world
 args = parser.parse_args()
 
