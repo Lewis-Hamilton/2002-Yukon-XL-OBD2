@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import queue
+import subprocess
 import threading
 from args import parser
 from utils import check_connection
@@ -28,25 +29,32 @@ def get_pi_cpu_temp():
         return None
 
 
+def figlet(text):
+    """Render text using figlet for large terminal display"""
+    try:
+        result = subprocess.run(['figlet', str(text)], capture_output=True, text=True)
+        return result.stdout
+    except Exception:
+        return f"  {text}\n"  # Fallback if figlet fails
+
+
 def render_terminal(data_store):
     """
-    Render all gauge data as large, readable terminal text.
-    Clears the screen each time so it updates in place.
+    Render gauge data as readable terminal text.
     """
     os.system('clear')
 
-    rpm      = data_store.get('RPM', 0)
     speed    = data_store.get('Speed', 0)
     coolant  = data_store.get('Coolant Temperature', 0)
     throttle = data_store.get('Throttle Position', 0)
     voltage  = data_store.get('Voltage', 0)
+    load     = data_store.get('Engine Load', 0)
     gear     = data_store.get('Estimated Gear', '---')
     pi_temp  = get_pi_cpu_temp()
 
-    # Build shift bar (20 chars wide)
-    bar_fill = int((min(rpm, 6000) / 6000) * 20)
-    bar      = '\u2588' * bar_fill + '\u2591' * (20 - bar_fill)
-    redline  = '  *** REDLINE ***' if rpm > 5000 else ''
+    # Engine load bar (30 chars wide)
+    bar_fill = int((min(load, 100) / 100) * 30)
+    bar      = '\u2588' * bar_fill + '\u2591' * (30 - bar_fill)
 
     # Voltage status
     try:
@@ -56,7 +64,7 @@ def render_terminal(data_store):
         elif v >= 12.0:
             voltage_status = '(LOW)'
         else:
-            voltage_status = '(CRITICAL)'
+            voltage_status = '(CRIT)'
     except (ValueError, TypeError):
         voltage_status = ''
 
@@ -65,33 +73,27 @@ def render_terminal(data_store):
 
     # Pi temp status
     if pi_temp is None:
-        pi_temp_str = '--'
-        pi_status   = ''
+        pi_str = '--C'
+        pi_status = ''
     else:
-        pi_temp_str = f'{pi_temp}C'
-    if pi_temp < 65:
-        pi_status = '(OK)'
-    elif pi_temp < 75:
-        pi_status = '(WARM)'
-    else:
-        pi_status = '(HOT!)'
+        pi_str = f'{pi_temp}C'
+        if pi_temp < 65:
+            pi_status = '(OK)'
+        elif pi_temp < 75:
+            pi_status = '(WARM)'
+        else:
+            pi_status = '(HOT!)'
 
-    print()
     print('============================')
-    print(f'  RPM:      {rpm}')
-    print(f'  [{bar}]{redline}')
+    print(f'  LOAD: {load}%')
+    print(f'  [{bar}]')
     print('============================')
-    print(f'  SPEED:    {speed} MPH')
-    print(f'  GEAR:     {gear}')
+    print(figlet(gear))
     print('============================')
-    print(f'  COOLANT:  {coolant}F  {coolant_status}')
-    print(f'  THROTTLE: {throttle}%')
-    print(f'  VOLTAGE:  {voltage}V  {voltage_status}')
+    print(f'  Coolant: {coolant}F {coolant_status}   Throttle: {throttle}%')
+    print(f'  Voltage: {voltage}V {voltage_status}   Pi: {pi_str} {pi_status}')
     print('============================')
-    print(f'  PI TEMP:  {pi_temp_str}  {pi_status}')
-    print('============================')
-    print()
-    print('  Press Ctrl+C to quit')
+    print('  Ctrl+C to quit')
 
 
 print("Starting up...")
