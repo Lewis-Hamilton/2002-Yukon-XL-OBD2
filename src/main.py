@@ -1,6 +1,11 @@
 import sys
 import time
 import queue
+
+# Should be near the top of main.py, BEFORE import pygame
+os.environ["SDL_VIDEODRIVER"] = "fbdev"
+os.environ["SDL_FBDEV"] = "/dev/fb0"
+
 import pygame
 import threading
 from args import parser
