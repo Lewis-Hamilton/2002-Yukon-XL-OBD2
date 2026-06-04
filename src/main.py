@@ -1,24 +1,20 @@
+import os
 import sys
 import time
 import queue
+import threading
 
-# Should be near the top of main.py, BEFORE import pygame
+# Must be set BEFORE importing pygame
 os.environ["SDL_VIDEODRIVER"] = "fbdev"
 os.environ["SDL_FBDEV"] = "/dev/fb0"
 
 import pygame
-import threading
 from args import parser
 from utils import check_connection
 from my_data import all_data
 from obd_worker import obd_worker
 from csv_logger import csv_logger
 from display import render_display
-
-# Add this temporarily at the top of main.py to see what driver pygame picked
-import pygame
-pygame.init()
-print(f"Video driver: {pygame.display.get_driver()}")
 
 # Import obd based on testing vs real world
 args = parser.parse_args()
@@ -43,18 +39,18 @@ try:
 
     # Data store shared between threads
     data_store = {data.name: 0 for data in all_data}
-    
+
     # Queue for passing data from OBD thread to CSV thread
     csv_queue = queue.Queue()
 
     # Start OBD Thread
     obd_thread = threading.Thread(
-        target=obd_worker, 
+        target=obd_worker,
         args=(connection, all_data, data_store, csv_queue),
         daemon=True
     )
     obd_thread.start()
-    
+
     # Start CSV Thread
     csv_thread = threading.Thread(
         target=csv_logger,
@@ -65,24 +61,24 @@ try:
 
     # Initialize Pygame
     pygame.init()
-    screen = pygame.display.set_mode((800, 800))  # Typical 3.5" display size
+
+    # Debug: print which video driver pygame is using
+    print(f"Video driver: {pygame.display.get_driver()}")
+
+    screen = pygame.display.set_mode((720, 480))
     font_large = pygame.font.Font(pygame.font.get_default_font(), 60)
-    font_small = pygame.font.Font(pygame.font.get_default_font(), 30)
+    font_small = pygame.font.Font(pygame.font.get_default_font(), 36)
     clock = pygame.time.Clock()
 
-    print("Display started - press Ctrl+C to quit")
+    print("Display running...")
 
     running = True
     while running:
-        # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        # Render all gauges
         render_display(screen, data_store, font_large, font_small)
-        
-        # Limit to 30 FPS
         clock.tick(30)
 
 except KeyboardInterrupt:
@@ -91,6 +87,6 @@ except Exception as e:
     print(f"Fatal error: {e}")
 finally:
     csv_queue.put(None)  # Tell CSV thread to stop
-    time.sleep(0.5)  # Give CSV thread time to finish
+    time.sleep(0.5)      # Give CSV thread time to finish
     connection.close()
     print("Connection closed. Script finished.")
