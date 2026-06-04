@@ -56,8 +56,8 @@ try:
     # Initialize Pygame
     pygame.init()
     screen = pygame.display.set_mode((800, 800))  # Typical 3.5" display size
-    font_large = pygame.font.Font("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 60)
-    font_small = pygame.font.Font("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 30)
+    font_large = pygame.font.Font(pygame.font.get_default_font(), 60)
+    font_small = pygame.font.Font(pygame.font.get_default_font(), 30)
     clock = pygame.time.Clock()
 
     print("Display started - press Ctrl+C to quit")
