@@ -2,3 +2,4 @@
 obd
 pytest
 pygame
+psutil

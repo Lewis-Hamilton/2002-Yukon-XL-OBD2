@@ -18,6 +18,16 @@ if args.testing == True:
 else:
     import obd
 
+def get_pi_stats():
+    """Get Raspberry Pi CPU and RAM usage"""
+    import psutil
+    cpu = psutil.cpu_percent(interval=None)
+    ram = psutil.virtual_memory()
+    ram_used = round(ram.used / 1024 / 1024)   # Convert to MB
+    ram_total = round(ram.total / 1024 / 1024)  # Convert to MB
+    ram_percent = ram.percent
+    return cpu, ram_used, ram_total, ram_percent
+
 def get_pi_cpu_temp():
     """Read Raspberry Pi CPU temperature in Celsius"""
     try:
@@ -52,9 +62,9 @@ def render_terminal(data_store):
     gear     = data_store.get('Estimated Gear', '---')
     pi_temp  = get_pi_cpu_temp()
 
-    # Engine load bar (30 chars wide)
-    bar_fill = int((min(load, 100) / 100) * 30)
-    bar      = '\u2588' * bar_fill + '\u2591' * (30 - bar_fill)
+    # Engine load bar (90 chars wide)
+    bar_fill = int((min(load, 100) / 100) * 90)
+    bar      = '\u2588' * bar_fill + '\u2591' * (90 - bar_fill)
 
     # Voltage status
     try:
@@ -84,17 +94,17 @@ def render_terminal(data_store):
         else:
             pi_status = '(HOT!)'
 
-    print('============================')
-    print(f'  LOAD: {load}%')
-    print(f'  [{bar}]')
+    print('====================================================================================')
+    print(f'=  LOAD: {load}%')
+    print(f'=  [{bar}]')
+    print(f'=  [{bar}]')
     print('============================')
     print(figlet(gear))
     print('============================')
-    print(f'  Coolant: {coolant}F {coolant_status}   Throttle: {throttle}%')
-    print(f'  Voltage: {voltage}V {voltage_status}   Pi: {pi_str} {pi_status}')
-    print('============================')
-    print('  Ctrl+C to quit')
-
+    print(f'=  Coolant: {coolant}F {coolant_status}   Throttle: {throttle}%')
+    print(f'=  Voltage: {voltage}V {voltage_status}   Pi: {pi_str} {pi_status}')
+    print(f'=  CPU: {cpu}%   RAM: {ram_used}MB / {ram_total}MB ({ram_percent}%)')
+    print('====================================================================================')
 
 print("Starting up...")
 
