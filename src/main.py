@@ -61,10 +61,11 @@ def render_terminal(data_store):
     load     = data_store.get('Engine Load', 0)
     gear     = data_store.get('Estimated Gear', '---')
     pi_temp  = get_pi_cpu_temp()
+    cpu, ram_used, ram_total, ram_percent = get_pi_stats()
 
     # Engine load bar (90 chars wide)
-    bar_fill = int((min(load, 100) / 100) * 90)
-    bar      = '\u2588' * bar_fill + '\u2591' * (90 - bar_fill)
+    bar_fill = int((min(load, 100) / 100) * 54)
+    bar      = '\u2588' * bar_fill + '\u2591' * (54 - bar_fill)
 
     # Voltage status
     try:
@@ -94,17 +95,34 @@ def render_terminal(data_store):
         else:
             pi_status = '(HOT!)'
 
-    print('====================================================================================')
-    print(f'=  LOAD: {load}%')
-    print(f'=  [{bar}]')
-    print(f'=  [{bar}]')
-    print('============================')
-    print(figlet(gear))
-    print('============================')
-    print(f'=  Coolant: {coolant}F {coolant_status}   Throttle: {throttle}%')
-    print(f'=  Voltage: {voltage}V {voltage_status}   Pi: {pi_str} {pi_status}')
-    print(f'=  CPU: {cpu}%   RAM: {ram_used}MB / {ram_total}MB ({ram_percent}%)')
-    print('====================================================================================')
+    # Build lines - each must fit inside 58 chars (60 minus 2 border chars)
+    WIDTH = 58
+    divider = '+' + '-' * WIDTH + '+'
+
+    def row(text=''):
+        # Pad or truncate to exactly WIDTH chars
+        return '|' + text.ljust(WIDTH)[:WIDTH] + '|'
+
+    # Get figlet output and split into lines
+    gear_figlet = figlet(gear).rstrip('\n').split('\n')
+
+    lines = []
+    lines.append(divider)
+    lines.append(row(f'  LOAD: {load}%'))
+    lines.append(row(f'  {bar}'))
+    lines.append(divider)
+    for gear_line in gear_figlet:
+        lines.append(row(gear_line))
+    lines.append(divider)
+    lines.append(row(f'  Coolant: {coolant}F {coolant_status}   Throttle: {throttle}%'))
+    lines.append(row(f'  Voltage: {voltage}V {voltage_status}   Pi: {pi_str} {pi_status}'))
+    lines.append(row(f'  CPU: {cpu}%   RAM: {ram_used}MB/{ram_total}MB ({ram_percent}%)'))
+    lines.append(divider)
+    lines.append(row('  Ctrl+C to quit'))
+    lines.append(divider)
+
+    for line in lines:
+        print(line)
 
 print("Starting up...")
 
