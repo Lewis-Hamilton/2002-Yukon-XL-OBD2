@@ -9,6 +9,8 @@ from utils import check_connection
 from my_data import all_data
 from obd_worker import obd_worker
 from csv_logger import csv_logger
+import random
+
 
 # Import obd based on testing vs real world
 args = parser.parse_args()
@@ -58,7 +60,10 @@ def render_terminal(data_store):
     voltage  = data_store.get('Voltage', 0)
     load     = data_store.get('Engine Load', 0)
     gear     = data_store.get('Estimated Gear', '---')
-    pi_temp  = get_pi_cpu_temp()
+    # temporary
+    # pi_temp  = get_pi_cpu_temp()
+    pi_temp = round(random.uniform(30, 85))
+
     cpu, ram_percent = get_pi_stats()
     bar_width = 54
 
@@ -78,6 +83,10 @@ def render_terminal(data_store):
     ram_bar_fill = int((min(ram_percent, 100) / 100) * bar_width)
     ram_bar      = '\u2588' * ram_bar_fill + '\u2591' * (bar_width - ram_bar_fill)
 
+    # Pi Temp bar
+    pi_temp_bar_fill = int((min(pi_temp, 100) / 100) * bar_width)
+    pi_temp_bar      = '\u2588' * pi_temp_bar_fill + '\u2591' * (bar_width - pi_temp_bar_fill)
+
     # Voltage status
     try:
         v = float(str(voltage).replace('V', '').strip())
@@ -96,15 +105,8 @@ def render_terminal(data_store):
     # Pi temp status
     if pi_temp is None:
         pi_str = '--C'
-        pi_status = ''
     else:
         pi_str = f'{pi_temp}C'
-        if pi_temp < 65:
-            pi_status = '(OK)'
-        elif pi_temp < 75:
-            pi_status = '(WARM)'
-        else:
-            pi_status = '(HOT!)'
 
     # Build lines - each must fit inside 58 chars (60 minus 2 border chars)
     WIDTH = 58
@@ -127,8 +129,10 @@ def render_terminal(data_store):
     for gear_line in gear_figlet:
         lines.append(row(gear_line))
     lines.append(divider)
-    lines.append(row(f'  Coolant: {coolant}F {coolant_status}   Throttle: {throttle}%'))
-    lines.append(row(f'  Voltage: {voltage}V {voltage_status}      Pi: {pi_str} {pi_status}'))
+    lines.append(row(f'  Coolant: {coolant}F {coolant_status}'))
+    lines.append(row(f'  Voltage: {voltage}V {voltage_status}'))
+    lines.append(row(f'  PI Temperature: {pi_str}'))
+    lines.append(row(f'  {pi_temp_bar}'))
     lines.append(row(f'  CPU: {cpu}%'))
     lines.append(row(f'  {cpu_bar}'))
     lines.append(row(f'  RAM: {ram_percent}%'))
