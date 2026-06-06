@@ -23,10 +23,8 @@ def get_pi_stats():
     import psutil
     cpu = psutil.cpu_percent(interval=None)
     ram = psutil.virtual_memory()
-    ram_used = round(ram.used / 1024 / 1024)   # Convert to MB
-    ram_total = round(ram.total / 1024 / 1024)  # Convert to MB
     ram_percent = ram.percent
-    return cpu, ram_used, ram_total, ram_percent
+    return cpu, ram_percent
 
 def get_pi_cpu_temp():
     """Read Raspberry Pi CPU temperature in Celsius"""
@@ -61,11 +59,24 @@ def render_terminal(data_store):
     load     = data_store.get('Engine Load', 0)
     gear     = data_store.get('Estimated Gear', '---')
     pi_temp  = get_pi_cpu_temp()
-    cpu, ram_used, ram_total, ram_percent = get_pi_stats()
+    cpu, ram_percent = get_pi_stats()
+    bar_width = 54
 
-    # Engine load bar (90 chars wide)
-    bar_fill = int((min(load, 100) / 100) * 54)
-    bar      = '\u2588' * bar_fill + '\u2591' * (54 - bar_fill)
+    # Engine load bar
+    load_bar_fill = int((min(load, 100) / 100) * bar_width)
+    load_bar      = '\u2588' * load_bar_fill + '\u2591' * (bar_width - load_bar_fill)
+
+    # Throttle bar
+    throttle_bar_fill = int((min(throttle, 100) / 100) * bar_width)
+    throttle_bar      = '\u2588' * throttle_bar_fill + '\u2591' * (bar_width - throttle_bar_fill)
+
+    # CPU bar
+    cpu_bar_fill = int((min(cpu, 100) / 100) * bar_width)
+    cpu_bar      = '\u2588' * cpu_bar_fill + '\u2591' * (bar_width - cpu_bar_fill)
+
+    # RAM bar
+    ram_bar_fill = int((min(ram_percent, 100) / 100) * bar_width)
+    ram_bar      = '\u2588' * ram_bar_fill + '\u2591' * (bar_width - ram_bar_fill)
 
     # Voltage status
     try:
@@ -109,14 +120,19 @@ def render_terminal(data_store):
     lines = []
     lines.append(divider)
     lines.append(row(f'  LOAD: {load}%'))
-    lines.append(row(f'  {bar}'))
+    lines.append(row(f'  {load_bar}'))
+    lines.append(row(f'  THROTTLE: {throttle}%'))
+    lines.append(row(f'  {throttle_bar}'))
     lines.append(divider)
     for gear_line in gear_figlet:
         lines.append(row(gear_line))
     lines.append(divider)
     lines.append(row(f'  Coolant: {coolant}F {coolant_status}   Throttle: {throttle}%'))
-    lines.append(row(f'  Voltage: {voltage}V {voltage_status}   Pi: {pi_str} {pi_status}'))
-    lines.append(row(f'  CPU: {cpu}%   RAM: {ram_used}MB/{ram_total}MB ({ram_percent}%)'))
+    lines.append(row(f'  Voltage: {voltage}V {voltage_status}      Pi: {pi_str} {pi_status}'))
+    lines.append(row(f'  CPU: {cpu}%'))
+    lines.append(row(f'  {cpu_bar}'))
+    lines.append(row(f'  RAM: {ram_percent}%'))
+    lines.append(row(f'  {ram_bar}'))
     lines.append(divider)
     lines.append(row('  Ctrl+C to quit'))
     lines.append(divider)
