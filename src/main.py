@@ -107,12 +107,8 @@ def render_terminal(data_store):
     voltage  = data_store.get('Voltage', 0)
     load     = data_store.get('Engine Load', 0)
     gear     = data_store.get('Estimated Gear', '---')
-    # temporary
-    # pi_temp  = get_pi_cpu_temp()
-    pi_temp = round(random.uniform(30, 85))
+    pi_temp  = get_pi_cpu_temp()
     gear_header, gear_fill = gear_indicator(gear, bar_width)
-    print(f"header length: {len(gear_header)}")
-    print(f"fill length: {len(gear_fill)}")
 
     cpu, ram_percent = get_pi_stats()
 
@@ -170,15 +166,13 @@ def render_terminal(data_store):
 
     lines = []
     lines.append(divider)
+    lines.append(row(f'  {gear_header}'))
+    lines.append(row(f'  {gear_fill}'))
+    lines.append(divider)
     lines.append(row(f'  LOAD: {load}%'))
     lines.append(row(f'  {load_bar}'))
     lines.append(row(f'  THROTTLE: {throttle}%'))
     lines.append(row(f'  {throttle_bar}'))
-    lines.append(divider)
-    lines.append(divider)
-    lines.append(row(f'  {gear_header}'))
-    lines.append(row(f'  {gear_fill}'))
-    lines.append(divider)
     lines.append(divider)
     lines.append(row(f'  Coolant: {coolant}F {coolant_status}'))
     lines.append(row(f'  Voltage: {voltage}V {voltage_status}'))
