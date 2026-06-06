@@ -47,6 +47,53 @@ def figlet(text):
     except Exception:
         return f"  {text}\n"  # Fallback if figlet fails
 
+bar_width = 54
+
+def gear_indicator(gear, bar_width):
+    gears = ['NONE', '1st', '2nd', '3rd', '4th']
+    gear_map = {
+        '1st':      1,
+        '2nd':      2,
+        '3rd':      3,
+        '4th (OD)': 4,
+        'N/P':      0,
+        '---':      0,
+    }
+
+    active = gear_map.get(gear, 4)
+
+    # Account for opening |, 4 inner dividers, closing |
+    total = bar_width - 6
+    base  = total // 4
+
+    # Make sure base - len(gear_label) is always even
+    # '1st', '2nd', '3rd', '4th' are all 3 chars
+    # so base - 3 must be even, meaning base must be odd
+    if (base - 3) % 2 != 0:
+        base -= 1
+
+    na_width = total - (base * 4)  # N/A gets whatever is left
+
+    widths = [na_width, base, base, base, base]
+
+    header = '|'
+    fill   = '|'
+
+    for i, (g, w) in enumerate(zip(gears, widths)):
+        dashes = w - len(g)
+        left   = dashes // 2
+        right  = dashes // 2
+        header += '-' * left + g + '-' * right
+
+        if i == active:
+            fill += '\u2588' * w
+        else:
+            fill += ' ' * w
+
+        header += '|'
+        fill   += '|'
+
+    return header, fill
 
 def render_terminal(data_store):
     """
@@ -63,9 +110,11 @@ def render_terminal(data_store):
     # temporary
     # pi_temp  = get_pi_cpu_temp()
     pi_temp = round(random.uniform(30, 85))
+    gear_header, gear_fill = gear_indicator(gear, bar_width)
+    print(f"header length: {len(gear_header)}")
+    print(f"fill length: {len(gear_fill)}")
 
     cpu, ram_percent = get_pi_stats()
-    bar_width = 54
 
     # Engine load bar
     load_bar_fill = int((min(load, 100) / 100) * bar_width)
@@ -126,8 +175,10 @@ def render_terminal(data_store):
     lines.append(row(f'  THROTTLE: {throttle}%'))
     lines.append(row(f'  {throttle_bar}'))
     lines.append(divider)
-    for gear_line in gear_figlet:
-        lines.append(row(gear_line))
+    lines.append(divider)
+    lines.append(row(f'  {gear_header}'))
+    lines.append(row(f'  {gear_fill}'))
+    lines.append(divider)
     lines.append(divider)
     lines.append(row(f'  Coolant: {coolant}F {coolant_status}'))
     lines.append(row(f'  Voltage: {voltage}V {voltage_status}'))
