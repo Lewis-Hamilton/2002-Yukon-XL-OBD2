@@ -10,6 +10,14 @@ else:
     import obd
     connection = obd.OBD(portstr="/dev/ttyUSB0")
 
+class AddedData:
+    def __init__(self, name, unit=""):
+        self.name = name
+        self.unit = unit
+        self.priority = None
+
+ESTIMATED_GEAR = AddedData(name="Estimated Gear", unit="")
+
 class Conversion:
     def __init__(self, amount, offset = 0):
         self.amount = amount
@@ -62,6 +70,8 @@ ENGINE_LOAD = ObdData(
     priority="fast",
     textToReplace=" percent"
 )
+
+ESTIMATED_GEAR = AddedData(name="Estimated Gear", unit="")
 
 FUEL_STATUS = ObdData(
     name="Fuel Status",
@@ -252,6 +262,7 @@ all_data = [
     # AUX_INPUT_STATUS,
     COOLANT_TEMP,
     ENGINE_LOAD,
+    ESTIMATED_GEAR,
     FUEL_STATUS,
     INTAKE_PRESSURE,
     INTAKE_TEMP,
