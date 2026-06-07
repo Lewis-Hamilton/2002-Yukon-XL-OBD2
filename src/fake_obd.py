@@ -91,7 +91,7 @@ class FakeOBD:
         elif command.name == "THROTTLE_POS":
             return FakeOBDResponse(f"{round(random.uniform(0.0, 99.9), 15)} percent")
         elif command.name == "INTAKE_TEMP":
-            return FakeOBDResponse(f"{random.uniform(0, 115)} degree_celsius")
+            return FakeOBDResponse(f"{random.uniform(0, 115)} degree_Celsius")
         elif command.name == "ENGINE_LOAD":
             return FakeOBDResponse(f"{round(random.uniform(0.0, 99.9), 15)} percent")
         elif command.name == "AUX_INPUT_STATUS":
