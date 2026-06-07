@@ -1,7 +1,7 @@
-import sys
 import time
 import queue
 import pygame
+import os
 import threading
 from args import parser
 from utils import check_connection
