@@ -15,10 +15,10 @@ def estimate_gear(rpm, speed, engine_load=None):
     TIRE_DIAMETER = 31.1  # inches
     CONSTANT = 336.13
 
-    GEAR_1_RATIO: 3.06
-    GEAR_2_RATIO: 1.63
-    GEAR_3_RATIO: 1.00
-    GEAR_4_RATIO: 0.70
+    GEAR_1_RATIO = 3.06
+    GEAR_2_RATIO = 1.63
+    GEAR_3_RATIO = 1.00
+    GEAR_4_RATIO = 0.70
 
     # Calculate theoretical RPM per MPH for each gear
     RPM_PER_MPH_1ST = (AXLE_RATIO * GEAR_1_RATIO * CONSTANT) / TIRE_DIAMETER  # ~123
