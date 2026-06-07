@@ -1,11 +1,12 @@
-import sys
 import time
-import csv
 import os
+import queue
+import threading
 from args import parser
-from utils import check_connection, celsius_to_fahrenheit, convert_to_number, get_filename, create_logging_dir
+from utils import check_connection
 from my_data import all_data
-from datetime import datetime
+from obd_worker import obd_worker
+from csv_logger import csv_logger
 
 args = parser.parse_args()
 
@@ -27,57 +28,51 @@ try:
 
     check_connection(connection)
 
-    create_logging_dir()
+    data_store = {data.name: 0 for data in all_data}
+    csv_queue = queue.Queue()
 
-    now = datetime.now()
+    # Start OBD Thread
+    obd_thread = threading.Thread(
+        target=obd_worker,
+        args=(connection, all_data, data_store, csv_queue),
+        daemon=True
+    )
+    obd_thread.start()
 
-    current_date = now.date()
-    if args.testing == True:
-        initial_csv_name = f"./logged_data/test-data-{current_date}.csv"
-    else:
-        initial_csv_name = f"./logged_data/{current_date}.csv"
-    csv_name = get_filename(initial_csv_name)
-    column_names = [f"{data.name} ({data.unit})" for data in all_data]
-    column_names.insert(0, "Time")
+    # Start CSV Thread
+    csv_thread = threading.Thread(
+        target=csv_logger,
+        args=(csv_queue, all_data, args),
+        daemon=True
+    )
+    csv_thread.start()
 
-    with open (csv_name, "w", newline="") as csvfile:
-        thewriter = csv.DictWriter(csvfile, fieldnames=column_names)
-        thewriter.writeheader()
-        print(f"Logging data to '{csv_name}'...")
+    while True:
+        try:
+            rpm = data_store.get('RPM', 0)
+            if rpm > 850:
+                print("Idle too high")
+            else:
+                print("Idle dropped")
 
-        while True:
-            try:
-                then = datetime.now()
-                data_row = {"Time": then.time()}
+            coolant = data_store.get('Coolant Temperature', 0)
+            if coolant < 195:
+                print("Coolant Cold")
+            else:
+                print("Coolant Warm")
 
-                for data in all_data:
-                    currentValue = data.response
-                    data_row[f"{data.name} ({data.unit})"] = currentValue
+            time.sleep(1)
 
-                    if data.name == "RPM":
-                        rpm_num = currentValue
-                        if rpm_num > 850:
-                           print("Idle too high")
-                        if rpm_num <= 850:
-                           print("Idle dropped")
-                    if data.name == "Coolant Tempurature":
-                        coolantF = currentValue
-                        if coolantF < 195:
-                            print("Coolant Cold")
-                        if coolantF >= 195:
-                            print("Coolant Warm")
+        except KeyboardInterrupt:
+            print("\nStopping")
+            break
 
-                thewriter.writerow(data_row)
-                csvfile.flush()
-                time.sleep(1)
-
-            except KeyboardInterrupt:
-                print("\nStopping")
-                break
-            except Exception as e:
-                print(f"An error occurred: {e}")
-                time.sleep(5)
-
+except KeyboardInterrupt:
+    print("\nStopping...")
+except Exception as e:
+    print(f"Fatal error: {e}")
 finally:
+    csv_queue.put(None)
+    time.sleep(0.5)
     connection.close()
     print("Connection closed. Script finished.")
