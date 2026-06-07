@@ -1,15 +1,12 @@
-import sys
 import time
-import csv
 import os
 import queue
 import threading
 from args import parser
-from utils import check_connection, celsius_to_fahrenheit, convert_to_number, get_filename, create_logging_dir
+from utils import check_connection
 from my_data import all_data
 from obd_worker import obd_worker
 from csv_logger import csv_logger
-from datetime import datetime
 
 args = parser.parse_args()
 
