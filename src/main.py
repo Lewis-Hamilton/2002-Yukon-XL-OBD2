@@ -1,14 +1,16 @@
-import sys
 import time
-import csv
-import os
-from args import parser
-from utils import check_connection, celsius_to_fahrenheit, convert_to_number, get_filename, create_logging_dir
-from my_data import all_data
-from datetime import datetime
+import queue
 import pygame
+import os
 import threading
+from args import parser
+from utils import check_connection
+from my_data import all_data
+from obd_worker import obd_worker
+from csv_logger import csv_logger
+from display import render_display
 
+# Import obd based on testing vs real world
 args = parser.parse_args()
 
 if args.testing == True:
@@ -29,107 +31,56 @@ try:
 
     check_connection(connection)
 
+    # Data store shared between threads
     data_store = {data.name: 0 for data in all_data}
-
-    def obd_worker():
-        tick = 0
-        while True:
-            try:
-
-                for data in all_data:
-                    # Use your existing logic that returns the "usable number"
-                    val = data.response
-                    data_store[data.name] = val
-                    time.sleep(0.2)
-                rpm = data_store.get("RPM", 0)
-                speed = data_store.get("Speed", 0)
-                
-                
-            except Exception as e:
-                print(f"OBD Thread Error: {e}")
-                time.sleep(1)
-            print(f"{data_store.get('RPM')}")
-            time.sleep(0.1) # Don't choke the CPU
+    
+    # Queue for passing data from OBD thread to CSV thread
+    csv_queue = queue.Queue()
 
     # Start OBD Thread
-    t = threading.Thread(target=obd_worker, daemon=True)
-    t.start()
+    obd_thread = threading.Thread(
+        target=obd_worker, 
+        args=(connection, all_data, data_store, csv_queue),
+        daemon=True
+    )
+    obd_thread.start()
+    
+    # Start CSV Thread
+    csv_thread = threading.Thread(
+        target=csv_logger,
+        args=(csv_queue, all_data, args),
+        daemon=True
+    )
+    csv_thread.start()
 
     # Initialize Pygame
     pygame.init()
-    screen = pygame.display.set_mode((480, 320)) # Typical 3.5" display size
-    font = pygame.font.SysFont("Arial", 80)
+    screen = pygame.display.set_mode((800, 800))  # Typical 3.5" display size
+    font_large = pygame.font.SysFont("Arial", 60)
+    font_small = pygame.font.SysFont("Arial", 30)
+    clock = pygame.time.Clock()
+
+    print("Display started - press Ctrl+C to quit")
 
     running = True
     while running:
+        # Handle events
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-        screen.fill((0, 0, 0)) # Black background
-
-        # Draw RPM (Digital)
-        rpm_text = font.render(f"RPM: {data_store['RPM']}", True, (0, 255, 0))
-        screen.blit(rpm_text, (50, 50))
+        # Render all gauges
+        render_display(screen, data_store, font_large, font_small)
         
-        # Draw a simple "Shift Bar"
-        bar_width = (data_store['RPM'] / 6000) * 400
-        pygame.draw.rect(screen, (255, 0, 0), (40, 150, bar_width, 50))
+        # Limit to 30 FPS
+        clock.tick(30)
 
-        pygame.display.flip()
-
-
-    # create_logging_dir()
-
-    # now = datetime.now()
-
-    # current_date = now.date()
-    # if args.testing == True:
-    #     initial_csv_name = f"./logged_data/test-data-{current_date}.csv"
-    # else:
-    #     initial_csv_name = f"./logged_data/{current_date}.csv"
-    # csv_name = get_filename(initial_csv_name)
-    # column_names = [f"{data.name} ({data.unit})" for data in all_data]
-    # column_names.insert(0, "Time")
-
-    # with open (csv_name, "w", newline="") as csvfile:
-    #     thewriter = csv.DictWriter(csvfile, fieldnames=column_names)
-    #     thewriter.writeheader()
-    #     print(f"Logging data to '{csv_name}'...")
-
-    #     while True:
-    #         try:
-    #             then = datetime.now()
-    #             data_row = {"Time": then.time()}
-
-    #             for data in all_data:
-    #                 currentValue = data.response
-    #                 data_row[f"{data.name} ({data.unit})"] = currentValue
-
-    #                 if data.name == "RPM":
-    #                     rpm_num = currentValue
-    #                     if rpm_num > 850:
-    #                        print("Idle too high")
-    #                     if rpm_num <= 850:
-    #                        print("Idle dropped")
-    #                 if data.name == "Coolant Tempurature":
-    #                     coolantF = currentValue
-    #                     if coolantF < 195:
-    #                         print("Coolant Cold")
-    #                     if coolantF >= 195:
-    #                         print("Coolant Warm")
-
-    #             thewriter.writerow(data_row)
-    #             csvfile.flush()
-    #             time.sleep(1)
-
-    #         except KeyboardInterrupt:
-    #             print("\nStopping")
-    #             break
-    #         except Exception as e:
-    #             print(f"An error occurred: {e}")
-    #             time.sleep(5)
-
+except KeyboardInterrupt:
+    print("\nStopping...")
+except Exception as e:
+    print(f"Fatal error: {e}")
 finally:
+    csv_queue.put(None)  # Tell CSV thread to stop
+    time.sleep(0.5)  # Give CSV thread time to finish
     connection.close()
     print("Connection closed. Script finished.")
