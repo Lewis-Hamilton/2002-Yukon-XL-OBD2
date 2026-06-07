@@ -38,15 +38,6 @@ def get_pi_cpu_temp():
     except Exception:
         return None
 
-
-def figlet(text):
-    """Render text using figlet for large terminal display"""
-    try:
-        result = subprocess.run(['figlet', str(text)], capture_output=True, text=True)
-        return result.stdout
-    except Exception:
-        return f"  {text}\n"  # Fallback if figlet fails
-
 bar_width = 54
 
 def gear_indicator(gear, bar_width):
@@ -160,9 +151,6 @@ def render_terminal(data_store):
     def row(text=''):
         # Pad or truncate to exactly WIDTH chars
         return '|' + text.ljust(WIDTH)[:WIDTH] + '|'
-
-    # Get figlet output and split into lines
-    gear_figlet = figlet(gear).rstrip('\n').split('\n')
 
     lines = []
     lines.append(divider)
