@@ -14,41 +14,43 @@ def estimate_gear(rpm, speed, engine_load=None):
     AXLE_RATIO = 3.73
     TIRE_DIAMETER = 31.1  # inches
     CONSTANT = 336.13
-    
-    # Transmission gear ratios (4L60E/4L65E typical for this vehicle)
-    # Gear 1: 3.06
-    # Gear 2: 1.63
-    # Gear 3: 1.00
-    # Gear 4: 0.70 (overdrive)
-    
+
+    GEAR_1_RATIO = 3.06
+    GEAR_2_RATIO = 1.63
+    GEAR_3_RATIO = 1.00
+    GEAR_4_RATIO = 0.70
+
     # Calculate theoretical RPM per MPH for each gear
-    RPM_PER_MPH_1ST = (AXLE_RATIO * 3.06 * CONSTANT) / TIRE_DIAMETER  # ~123
-    RPM_PER_MPH_2ND = (AXLE_RATIO * 1.63 * CONSTANT) / TIRE_DIAMETER  # ~65
-    RPM_PER_MPH_3RD = (AXLE_RATIO * 1.00 * CONSTANT) / TIRE_DIAMETER  # ~40
-    RPM_PER_MPH_4TH = (AXLE_RATIO * 0.70 * CONSTANT) / TIRE_DIAMETER  # ~28
-    
+    RPM_PER_MPH_1ST = (AXLE_RATIO * GEAR_1_RATIO * CONSTANT) / TIRE_DIAMETER  # ~123
+    RPM_PER_MPH_2ND = (AXLE_RATIO * GEAR_2_RATIO * CONSTANT) / TIRE_DIAMETER  # ~65
+    RPM_PER_MPH_3RD = (AXLE_RATIO * GEAR_3_RATIO * CONSTANT) / TIRE_DIAMETER  # ~40
+    RPM_PER_MPH_4TH = (AXLE_RATIO * GEAR_4_RATIO * CONSTANT) / TIRE_DIAMETER  # ~28
+
     # Handle edge cases
     if speed < 5:
         return "N/P"  # Neutral/Park or too slow to determine
-    
+
     if rpm == 0:
         return "---"  # No RPM data
-    
+
     # Calculate current ratio (RPM per MPH)
     current_ratio = rpm / speed
-    
+
     # Determine gear using midpoints between theoretical ratios
     # Midpoint between 1st and 2nd: (123 + 65) / 2 = 94
     # Midpoint between 2nd and 3rd: (65 + 40) / 2 = 52.5
     # Midpoint between 3rd and 4th: (40 + 28) / 2 = 34
-    
-    if current_ratio > 90:
+    MIDPOINT_1ST_2ND = 90
+    MIDPOINT_2ND_3RD = 52
+    MIDPOINT_3RD_4TH = 34
+
+    if current_ratio > MIDPOINT_1ST_2ND:
         return "1st"
-    elif 52 < current_ratio <= 90:
+    elif MIDPOINT_2ND_3RD < current_ratio <= MIDPOINT_1ST_2ND:
         return "2nd"
-    elif 34 < current_ratio <= 52:
+    elif MIDPOINT_3RD_4TH < current_ratio <= MIDPOINT_2ND_3RD:
         return "3rd"
-    elif current_ratio <= 34:
+    elif current_ratio <= MIDPOINT_3RD_4TH:
         return "4th (OD)"
     else:
         return "---"  # Shouldn't reach here, but safety fallback

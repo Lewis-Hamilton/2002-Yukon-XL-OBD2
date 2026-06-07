@@ -1,6 +1,6 @@
 import time
 from datetime import datetime
-from calculations import estimate_gear
+from gear_calc import estimate_gear
 
 def obd_worker(connection, all_data, data_store, csv_queue):
     """
@@ -32,19 +32,15 @@ def obd_worker(connection, all_data, data_store, csv_queue):
             # Update sensors based on their priority
             for data in all_data:
                 time_since_update = current_time - last_update_times[data.name]
-                interval = priority_intervals.get(data.priority, 5.0)
+                interval = priority_intervals.get(data.priority, None)
                 
+                if interval is None:
+                    continue
                 # Should we update this sensor now?
-                if time_since_update >= interval:
+                elif time_since_update >= interval:
                     val = data.response  # Query the car
                     data_store[data.name] = val
                     last_update_times[data.name] = current_time
-            
-            # Calculate estimated gear based on RPM and Speed
-            rpm = data_store.get("RPM", 0)
-            speed = data_store.get("Speed", 0)
-            engine_load = data_store.get("Engine Load", None)
-            data_store["Estimated Gear"] = estimate_gear(rpm, speed, engine_load)
             
             # Write to CSV every 1 second
             if current_time - last_csv_write >= 1.0:
@@ -52,9 +48,6 @@ def obd_worker(connection, all_data, data_store, csv_queue):
                 
                 for data in all_data:
                     data_row[f"{data.name} ({data.unit})"] = data_store.get(data.name, 0)
-                
-                # Add estimated gear to CSV
-                data_row["Estimated Gear"] = data_store.get("Estimated Gear", "---")
                 
                 csv_queue.put(data_row)  # Send to CSV thread
                 last_csv_write = current_time
@@ -64,3 +57,9 @@ def obd_worker(connection, all_data, data_store, csv_queue):
         except Exception as e:
             print(f"OBD Thread Error: {e}")
             time.sleep(1)
+
+        data_store["Estimated Gear"] = estimate_gear(
+        data_store.get("RPM", 0),
+        data_store.get("Speed", 0),
+        data_store.get("Engine Load", 0)
+)
