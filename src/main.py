@@ -20,24 +20,6 @@ if args.testing == True:
 else:
     import obd
 
-def get_pi_stats():
-    """Get Raspberry Pi CPU and RAM usage"""
-    import psutil
-    cpu = psutil.cpu_percent(interval=None)
-    ram = psutil.virtual_memory()
-    ram_percent = ram.percent
-    return cpu, ram_percent
-
-def get_pi_cpu_temp():
-    """Read Raspberry Pi CPU temperature in Celsius"""
-    try:
-        with open("/sys/class/thermal/thermal_zone0/temp", "r") as f:
-            temp_milli_c = int(f.read().strip())
-            temp_c = temp_milli_c / 1000.0
-            return round(temp_c, 1)
-    except Exception:
-        return None
-
 bar_width = 54
 
 def gear_indicator(gear, bar_width):
@@ -98,10 +80,10 @@ def render_terminal(data_store):
     voltage  = data_store.get('Voltage', 0)
     load     = data_store.get('Engine Load', 0)
     gear     = data_store.get('Estimated Gear', '---')
-    pi_temp  = get_pi_cpu_temp()
+    pi_cpu_temp = data_store.get('PI CPU Temperature')
+    pi_cpu_usage = data_store.get('PI CPU Usage')
+    pi_ram_usage = data_store.get('PI RAM Usage')
     gear_header, gear_fill = gear_indicator(gear, bar_width)
-
-    cpu, ram_percent = get_pi_stats()
 
     # Engine load bar
     load_bar_fill = int((min(load, 100) / 100) * bar_width)
@@ -112,15 +94,15 @@ def render_terminal(data_store):
     throttle_bar      = '\u2588' * throttle_bar_fill + '\u2591' * (bar_width - throttle_bar_fill)
 
     # CPU bar
-    cpu_bar_fill = int((min(cpu, 100) / 100) * bar_width)
+    cpu_bar_fill = int((min(pi_cpu_usage, 100) / 100) * bar_width)
     cpu_bar      = '\u2588' * cpu_bar_fill + '\u2591' * (bar_width - cpu_bar_fill)
 
     # RAM bar
-    ram_bar_fill = int((min(ram_percent, 100) / 100) * bar_width)
+    ram_bar_fill = int((min(pi_ram_usage, 100) / 100) * bar_width)
     ram_bar      = '\u2588' * ram_bar_fill + '\u2591' * (bar_width - ram_bar_fill)
 
     # Pi Temp bar
-    pi_temp_bar_fill = int((min(pi_temp, 100) / 100) * bar_width)
+    pi_temp_bar_fill = int((min(pi_cpu_temp, 100) / 100) * bar_width)
     pi_temp_bar      = '\u2588' * pi_temp_bar_fill + '\u2591' * (bar_width - pi_temp_bar_fill)
 
     # Voltage status
@@ -139,10 +121,10 @@ def render_terminal(data_store):
     coolant_status = '(COLD)' if coolant < 195 else '(WARM)'
 
     # Pi temp status
-    if pi_temp is None:
+    if pi_cpu_temp is None:
         pi_str = '--C'
     else:
-        pi_str = f'{pi_temp}C'
+        pi_str = f'{pi_cpu_temp}C'
 
     # Build lines - each must fit inside 58 chars (60 minus 2 border chars)
     WIDTH = 58
@@ -166,9 +148,9 @@ def render_terminal(data_store):
     lines.append(row(f'  Voltage: {voltage}V {voltage_status}'))
     lines.append(row(f'  PI Temperature: {pi_str}'))
     lines.append(row(f'  {pi_temp_bar}'))
-    lines.append(row(f'  CPU: {cpu}%'))
+    lines.append(row(f'  CPU: {pi_cpu_usage}%'))
     lines.append(row(f'  {cpu_bar}'))
-    lines.append(row(f'  RAM: {ram_percent}%'))
+    lines.append(row(f'  RAM: {pi_ram_usage}%'))
     lines.append(row(f'  {ram_bar}'))
     lines.append(divider)
     lines.append(row('  Ctrl+C to quit'))

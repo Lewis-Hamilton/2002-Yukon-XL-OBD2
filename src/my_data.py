@@ -173,6 +173,12 @@ OBD_COMPLIANCE = ObdData(
     priority="slow",
 )
 
+PI_CPU_TEMP = AddedData(name="PI CPU Temperature", unit="Celsius")
+
+PI_CPU_USAGE = AddedData(name="PI CPU Usage", unit="Percentage")
+
+PI_RAM_USAGE = AddedData(name="PI RAM Usage", unit="Percentage")
+
 PIDS_9A = ObdData(
     name="PIDS 9A",
     cmd=obd.commands.PIDS_9A,
