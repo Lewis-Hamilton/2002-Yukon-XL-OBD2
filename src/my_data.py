@@ -69,7 +69,7 @@ COOLANT_TEMP = ObdData(
     name="Coolant Temperature",
     cmd=obd.commands.COOLANT_TEMP,
     unit="Fahrenheit",
-    priority="fast",
+    priority="medium",
     textToReplace=" degree_Celsius",
     conversion = Conversion(amount= 1.8, offset= 32) 
     )
@@ -289,7 +289,7 @@ VOLTAGE = ObdData(
     name="Voltage",
     cmd=obd.commands.ELM_VOLTAGE,
     unit="Volts",
-    priority="fast",
+    priority="medium",
     textToReplace=" volt"
 )
 
