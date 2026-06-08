@@ -8,7 +8,6 @@ from utils import check_connection
 from my_data import all_data
 from obd_worker import obd_worker
 from csv_logger import csv_logger
-import random
 from render_terminal import render_terminal
 
 

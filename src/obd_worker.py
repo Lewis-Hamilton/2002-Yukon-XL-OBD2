@@ -1,7 +1,6 @@
 import time
 from datetime import datetime
 from gear_calc import estimate_gear
-from get_pi_data import get_pi_stats, get_pi_cpu_temp
 
 def obd_worker(connection, all_data, data_store, csv_queue):
     """
@@ -63,9 +62,4 @@ def obd_worker(connection, all_data, data_store, csv_queue):
         data_store.get("RPM", 0),
         data_store.get("Speed", 0),
         data_store.get("Engine Load", 0)
-)
-
-        cpu_usage, ram_usage = get_pi_stats()
-        data_store["PI CPU Temperature"] = get_pi_cpu_temp()
-        data_store["PI CPU Usage"] = cpu_usage
-        data_store["PI RAM Usage"] = ram_usage
+        )

@@ -1,4 +1,7 @@
 from args import parser
+from gear_calc import estimate_gear
+from get_pi_data import get_pi_cpu_usage, get_pi_ram_usage, get_pi_cpu_temp
+import random
 
 args = parser.parse_args()
 
@@ -11,10 +14,18 @@ else:
     connection = obd.OBD(portstr="/dev/ttyUSB0")
 
 class AddedData:
-    def __init__(self, name, unit=""):
+    def __init__(self, name, unit="", real_func=None, testing_func=None):
         self.name = name
         self.unit = unit
-        self.priority = None
+        self.priority = "fast"
+        self.real_func = real_func
+        self.testing_func = testing_func or real_func
+    
+    @property
+    def response(self):
+        if args.testing and self.testing_func:
+            return self.testing_func()
+        return self.real_func() if self.real_func else None
 
 ESTIMATED_GEAR = AddedData(name="Estimated Gear", unit="")
 
@@ -71,7 +82,10 @@ ENGINE_LOAD = ObdData(
     textToReplace=" percent"
 )
 
-ESTIMATED_GEAR = AddedData(name="Estimated Gear", unit="")
+ESTIMATED_GEAR = AddedData(
+    name="Estimated Gear",
+    unit="",
+)
 
 FUEL_STATUS = ObdData(
     name="Fuel Status",
@@ -173,11 +187,26 @@ OBD_COMPLIANCE = ObdData(
     priority="slow",
 )
 
-PI_CPU_TEMP = AddedData(name="PI CPU Temperature", unit="Celsius")
+PI_CPU_TEMP = AddedData(
+    name="PI CPU Temperature",
+    unit="Celsius",
+    real_func=get_pi_cpu_temp,
+    testing_func=lambda: round(random.uniform(30, 85))
+    )
 
-PI_CPU_USAGE = AddedData(name="PI CPU Usage", unit="Percentage")
+PI_CPU_USAGE = AddedData(
+    name="PI CPU Usage",
+    unit="Percentage",
+    real_func=get_pi_cpu_usage,
+    testing_func=lambda: round(random.uniform(0, 100))
+    )
 
-PI_RAM_USAGE = AddedData(name="PI RAM Usage", unit="Percentage")
+PI_RAM_USAGE = AddedData(
+    name="PI RAM Usage",
+    unit="Percentage",
+    real_func=get_pi_ram_usage,
+    testing_func=lambda: round(random.uniform(0, 100))
+    )
 
 PIDS_9A = ObdData(
     name="PIDS 9A",

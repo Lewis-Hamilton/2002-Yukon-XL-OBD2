@@ -1,10 +1,12 @@
 import psutil
 
-def get_pi_stats():
-    cpu_usage = psutil.cpu_percent(interval=None)
-    ram = psutil.virtual_memory()
-    ram_usage = ram.percent
-    return cpu_usage, ram_usage
+def get_pi_cpu_usage():
+    import psutil
+    return psutil.cpu_percent(interval=None)
+
+def get_pi_ram_usage():
+    import psutil
+    return psutil.virtual_memory().percent
 
 def get_pi_cpu_temp():
     try:
