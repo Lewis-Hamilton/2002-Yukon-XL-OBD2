@@ -48,6 +48,11 @@ def gear_indicator(gear, bar_width):
 
     return header, fill
 
+def progress_bar(bar_data):
+    bar_fill = int((min(bar_data, 100) / 100) * bar_width)
+    bar      = '\u2588' * bar_fill + '\u2591' * (bar_width - bar_fill)
+    return bar
+
 def render_terminal(data_store):
     """
     Render gauge data as readable terminal text.
@@ -61,26 +66,6 @@ def render_terminal(data_store):
     pi_cpu_usage = data_store.get('PI CPU Usage')
     pi_ram_usage = data_store.get('PI RAM Usage')
     gear_header, gear_fill = gear_indicator(gear, bar_width)
-
-    # Engine load bar
-    load_bar_fill = int((min(load, 100) / 100) * bar_width)
-    load_bar      = '\u2588' * load_bar_fill + '\u2591' * (bar_width - load_bar_fill)
-
-    # Throttle bar
-    throttle_bar_fill = int((min(throttle, 100) / 100) * bar_width)
-    throttle_bar      = '\u2588' * throttle_bar_fill + '\u2591' * (bar_width - throttle_bar_fill)
-
-    # CPU bar
-    cpu_bar_fill = int((min(pi_cpu_usage, 100) / 100) * bar_width)
-    cpu_bar      = '\u2588' * cpu_bar_fill + '\u2591' * (bar_width - cpu_bar_fill)
-
-    # RAM bar
-    ram_bar_fill = int((min(pi_ram_usage, 100) / 100) * bar_width)
-    ram_bar      = '\u2588' * ram_bar_fill + '\u2591' * (bar_width - ram_bar_fill)
-
-    # Pi Temp bar
-    pi_temp_bar_fill = int((min(pi_cpu_temp, 100) / 100) * bar_width)
-    pi_temp_bar      = '\u2588' * pi_temp_bar_fill + '\u2591' * (bar_width - pi_temp_bar_fill)
 
     # Pi temp status
     if pi_cpu_temp is None:
@@ -103,16 +88,16 @@ def render_terminal(data_store):
     lines.append(row(f' {gear_fill}'))
     lines.append(divider)
     lines.append(row(f' LOAD: {load}%'))
-    lines.append(row(f' {load_bar}'))
+    lines.append(row(f' {progress_bar(load)}'))
     lines.append(row(f' THROTTLE: {throttle}%'))
-    lines.append(row(f' {throttle_bar}'))
+    lines.append(row(f' {progress_bar(throttle)}'))
     lines.append(divider)
     lines.append(row(f' PI Temperature: {pi_str}'))
-    lines.append(row(f' {pi_temp_bar}'))
+    lines.append(row(f' {progress_bar(pi_cpu_temp)}'))
     lines.append(row(f' CPU: {pi_cpu_usage}%'))
-    lines.append(row(f' {cpu_bar}'))
+    lines.append(row(f' {progress_bar(pi_cpu_usage)}'))
     lines.append(row(f' RAM: {pi_ram_usage}%'))
-    lines.append(row(f' {ram_bar}'))
+    lines.append(row(f' {progress_bar(pi_ram_usage)}'))
     lines.append(divider)
     lines.append(altdivider)
     lines.append(divider)
