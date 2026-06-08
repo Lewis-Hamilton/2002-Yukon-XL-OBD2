@@ -1,6 +1,6 @@
 import os
 
-bar_width = 52
+bar_width = 54
 
 def gear_indicator(gear, bar_width):
     gears = ['NONE', '1st', '2nd', '3rd', '4th']
@@ -99,20 +99,20 @@ def render_terminal(data_store):
 
     lines = []
     lines.append(divider)
-    lines.append(row(f'  {gear_header}'))
-    lines.append(row(f'  {gear_fill}'))
+    lines.append(row(f' {gear_header}'))
+    lines.append(row(f' {gear_fill}'))
     lines.append(divider)
-    lines.append(row(f'  LOAD: {load}%'))
-    lines.append(row(f'  {load_bar}'))
-    lines.append(row(f'  THROTTLE: {throttle}%'))
-    lines.append(row(f'  {throttle_bar}'))
+    lines.append(row(f' LOAD: {load}%'))
+    lines.append(row(f' {load_bar}'))
+    lines.append(row(f' THROTTLE: {throttle}%'))
+    lines.append(row(f' {throttle_bar}'))
     lines.append(divider)
-    lines.append(row(f'  PI Temperature: {pi_str}'))
-    lines.append(row(f'  {pi_temp_bar}'))
-    lines.append(row(f'  CPU: {pi_cpu_usage}%'))
-    lines.append(row(f'  {cpu_bar}'))
-    lines.append(row(f'  RAM: {pi_ram_usage}%'))
-    lines.append(row(f'  {ram_bar}'))
+    lines.append(row(f' PI Temperature: {pi_str}'))
+    lines.append(row(f' {pi_temp_bar}'))
+    lines.append(row(f' CPU: {pi_cpu_usage}%'))
+    lines.append(row(f' {cpu_bar}'))
+    lines.append(row(f' RAM: {pi_ram_usage}%'))
+    lines.append(row(f' {ram_bar}'))
     lines.append(divider)
     lines.append(altdivider)
     lines.append(divider)
