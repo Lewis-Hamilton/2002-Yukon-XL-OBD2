@@ -1,7 +1,6 @@
 import sys
 import time
 import queue
-import subprocess
 import threading
 from args import parser
 from utils import check_connection
@@ -10,8 +9,6 @@ from obd_worker import obd_worker
 from csv_logger import csv_logger
 from render_terminal import render_terminal
 
-
-# Import obd based on testing vs real world
 args = parser.parse_args()
 
 if args.testing == True:
