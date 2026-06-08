@@ -54,10 +54,7 @@ def render_terminal(data_store):
     """
     os.system('clear')
 
-    speed    = data_store.get('Speed', 0)
-    coolant  = data_store.get('Coolant Temperature', 0)
     throttle = data_store.get('Throttle Position', 0)
-    voltage  = data_store.get('Voltage', 0)
     load     = data_store.get('Engine Load', 0)
     gear     = data_store.get('Estimated Gear', '---')
     pi_cpu_temp = data_store.get('PI CPU Temperature')
@@ -85,21 +82,6 @@ def render_terminal(data_store):
     pi_temp_bar_fill = int((min(pi_cpu_temp, 100) / 100) * bar_width)
     pi_temp_bar      = '\u2588' * pi_temp_bar_fill + '\u2591' * (bar_width - pi_temp_bar_fill)
 
-    # Voltage status
-    try:
-        v = float(str(voltage).replace('V', '').strip())
-        if v >= 13.0:
-            voltage_status = '(OK)'
-        elif v >= 12.0:
-            voltage_status = '(LOW)'
-        else:
-            voltage_status = '(CRIT)'
-    except (ValueError, TypeError):
-        voltage_status = ''
-
-    # Coolant status
-    coolant_status = '(COLD)' if coolant < 195 else '(WARM)'
-
     # Pi temp status
     if pi_cpu_temp is None:
         pi_str = '--C'
@@ -124,8 +106,6 @@ def render_terminal(data_store):
     lines.append(row(f'  THROTTLE: {throttle}%'))
     lines.append(row(f'  {throttle_bar}'))
     lines.append(divider)
-    lines.append(row(f'  Coolant: {coolant}F {coolant_status}'))
-    lines.append(row(f'  Voltage: {voltage}V {voltage_status}'))
     lines.append(row(f'  PI Temperature: {pi_str}'))
     lines.append(row(f'  {pi_temp_bar}'))
     lines.append(row(f'  CPU: {pi_cpu_usage}%'))
