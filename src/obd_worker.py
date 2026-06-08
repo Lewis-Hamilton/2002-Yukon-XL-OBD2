@@ -18,9 +18,9 @@ def obd_worker(connection, all_data, data_store, csv_queue):
     
     # Define update intervals for each priority (in seconds)
     priority_intervals = {
-        "fast": 0.5,    # Update twice per second
-        "medium": 2.0,  # Update every 2 seconds
-        "slow": 10.0    # Update every 10 seconds
+        "fast": 0.75,
+        "medium": 2.5,
+        "slow": 10.0
     }
     
     print("OBD worker thread started")
@@ -62,4 +62,4 @@ def obd_worker(connection, all_data, data_store, csv_queue):
         data_store.get("RPM", 0),
         data_store.get("Speed", 0),
         data_store.get("Engine Load", 0)
-)
+        )

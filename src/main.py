@@ -1,5 +1,5 @@
+import sys
 import time
-import os
 import queue
 import threading
 from args import parser
@@ -7,6 +7,7 @@ from utils import check_connection
 from my_data import all_data
 from obd_worker import obd_worker
 from csv_logger import csv_logger
+from render_terminal import render_terminal
 
 args = parser.parse_args()
 
@@ -28,7 +29,10 @@ try:
 
     check_connection(connection)
 
+    # Data store shared between threads
     data_store = {data.name: 0 for data in all_data}
+
+    # Queue for passing data from OBD thread to CSV thread
     csv_queue = queue.Queue()
 
     # Start OBD Thread
@@ -47,32 +51,19 @@ try:
     )
     csv_thread.start()
 
+    print("Running! Data will appear shortly...")
+    time.sleep(2)  # Give OBD thread time to get first readings
+
     while True:
-        try:
-            rpm = data_store.get('RPM', 0)
-            if rpm > 850:
-                print("Idle too high")
-            else:
-                print("Idle dropped")
-
-            coolant = data_store.get('Coolant Temperature', 0)
-            if coolant < 195:
-                print("Coolant Cold")
-            else:
-                print("Coolant Warm")
-
-            time.sleep(1)
-
-        except KeyboardInterrupt:
-            print("\nStopping")
-            break
+        render_terminal(data_store)
+        time.sleep(0.75)  # Need to update in obd_worker as well
 
 except KeyboardInterrupt:
     print("\nStopping...")
 except Exception as e:
     print(f"Fatal error: {e}")
 finally:
-    csv_queue.put(None)
-    time.sleep(0.5)
+    csv_queue.put(None)  # Tell CSV thread to stop
+    time.sleep(0.5)      # Give CSV thread time to finish
     connection.close()
     print("Connection closed. Script finished.")
