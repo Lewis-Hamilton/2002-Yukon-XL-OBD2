@@ -1,6 +1,6 @@
 import os
 
-bar_width = 53
+bar_width = 52
 
 def gear_indicator(gear, bar_width):
     gears = ['NONE', '1st', '2nd', '3rd', '4th']
@@ -89,7 +89,7 @@ def render_terminal(data_store):
         pi_str = f'{pi_cpu_temp}C'
 
     # Build lines - each must fit inside 58 chars (60 minus 2 border chars)
-    WIDTH = 57
+    WIDTH = 56
     divider = '+' + '-' * WIDTH + '+'
     altdivider = '-' + '+' * WIDTH + '-'
 
