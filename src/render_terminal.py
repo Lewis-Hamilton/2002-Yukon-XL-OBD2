@@ -1,6 +1,6 @@
 import os
 
-bar_width = 54
+bar_width = 53
 
 def gear_indicator(gear, bar_width):
     gears = ['NONE', '1st', '2nd', '3rd', '4th']
@@ -89,8 +89,9 @@ def render_terminal(data_store):
         pi_str = f'{pi_cpu_temp}C'
 
     # Build lines - each must fit inside 58 chars (60 minus 2 border chars)
-    WIDTH = 58
+    WIDTH = 57
     divider = '+' + '-' * WIDTH + '+'
+    altdivider = '-' + '+' * WIDTH + '-'
 
     def row(text=''):
         # Pad or truncate to exactly WIDTH chars
@@ -113,7 +114,11 @@ def render_terminal(data_store):
     lines.append(row(f'  RAM: {pi_ram_usage}%'))
     lines.append(row(f'  {ram_bar}'))
     lines.append(divider)
-    lines.append(row('  Ctrl+C to quit'))
+    lines.append(altdivider)
+    lines.append(divider)
+    lines.append(altdivider)
+    lines.append(divider)
+    lines.append(altdivider)
     lines.append(divider)
 
     for line in lines:
