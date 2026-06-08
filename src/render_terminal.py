@@ -117,9 +117,6 @@ def render_terminal(data_store):
     lines.append(altdivider)
     lines.append(divider)
     lines.append(altdivider)
-    lines.append(divider)
-    lines.append(altdivider)
-    lines.append(divider)
 
     for line in lines:
         print(line)
