@@ -59,7 +59,7 @@ try:
 
     while True:
         render_terminal(data_store)
-        time.sleep(0.5)  # Refresh twice per second
+        time.sleep(0.75)  # Need to update in obd_worker as well
 
 except KeyboardInterrupt:
     print("\nStopping...")
