@@ -1,8 +1,7 @@
 import time
-import os
 from stereo_screen import print_screen, INNER_WIDTH, INNER_HEIGHT
 
-DELAY = 1
+DELAY = 0.9
 
 def startup_screen(connect_thread):
     # Perfectly symmetrical 15-character wide G
