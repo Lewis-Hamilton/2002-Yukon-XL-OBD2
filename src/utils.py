@@ -5,7 +5,7 @@ def check_connection(connection):
         print("Failed to connect to the OBD-II adapter. Make sure it's plugged in and your car's ignition is on.")
         raise ConnectionError("OBD-II connection failed")
     else:
-        print("Connected to OBD-II adapter!")
+        return None
 
 def get_filename(filename):
     """

@@ -1,4 +1,5 @@
 import sys
+import os
 import time
 import queue
 import threading
@@ -7,7 +8,8 @@ from utils import check_connection
 from my_data import all_data
 from obd_worker import obd_worker
 from csv_logger import csv_logger
-from render_terminal import render_terminal
+from render_terminal import render_terminal, data_animation
+from stereo_screen import hide_cursor, show_cursor
 from startup_screen import startup_screen
 
 args = parser.parse_args()
@@ -16,6 +18,9 @@ if args.testing == True:
     import fake_obd as obd
 else:
     import obd
+    
+os.system('clear')
+hide_cursor()
 
 # Set up connection variables
 connection = None
@@ -67,6 +72,7 @@ try:
     csv_thread.start()
 
     time.sleep(2)  # Give OBD thread time to get first readings
+    data_animation()
 
     while True:
         render_terminal(data_store)
@@ -77,6 +83,7 @@ except KeyboardInterrupt:
 except Exception as e:
     print(f"Fatal error: {e}")
 finally:
+    show_cursor()
     csv_queue.put(None)  # Tell CSV thread to stop
     time.sleep(0.5)      # Give CSV thread time to finish
     connection.close()
