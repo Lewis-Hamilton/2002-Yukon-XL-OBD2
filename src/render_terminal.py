@@ -14,7 +14,7 @@ def gear_indicator(gear, bar_width):
         '---':      0,
     }
 
-    active = gear_map.get(gear, 4)
+    active = gear_map.get(gear, 0)
 
     # Account for opening |, 4 inner dividers, closing |
     total = bar_width - 6
