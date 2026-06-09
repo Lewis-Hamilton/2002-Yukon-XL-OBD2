@@ -8,6 +8,7 @@ from my_data import all_data
 from obd_worker import obd_worker
 from csv_logger import csv_logger
 from render_terminal import render_terminal
+from startup_screen import startup_screen
 
 args = parser.parse_args()
 
@@ -16,23 +17,37 @@ if args.testing == True:
 else:
     import obd
 
-print("Starting up...")
+# Set up connection variables
+connection = None
+connection_error = None
+
+def connect_obd():
+    global connection, connection_error
+    try:
+        if args.testing == True:
+            connection = obd.FakeOBD()
+        else:
+            connection = obd.OBD()
+        check_connection(connection)
+    except Exception as e:
+        connection_error = e
+
+# Start connecting in background
+connect_thread = threading.Thread(target=connect_obd, daemon=True)
+connect_thread.start()
+
+# Play animation while connection happens, passing thread and csv check
+startup_screen(connect_thread)
+
+# Handle connection result
+if connection_error:
+    raise connection_error
+
+if connection is None:
+    raise ConnectionError("OBD connection timed out")
 
 try:
-    print("Connecting...")
-
-    if args.testing == True:
-        print("Running in test mode with fake obd data")
-        connection = obd.FakeOBD()
-    else:
-        connection = obd.OBD(portstr="/dev/ttyUSB0")
-
-    check_connection(connection)
-
-    # Data store shared between threads
     data_store = {data.name: 0 for data in all_data}
-
-    # Queue for passing data from OBD thread to CSV thread
     csv_queue = queue.Queue()
 
     # Start OBD Thread
@@ -51,7 +66,6 @@ try:
     )
     csv_thread.start()
 
-    print("Running! Data will appear shortly...")
     time.sleep(2)  # Give OBD thread time to get first readings
 
     while True:

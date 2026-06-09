@@ -1,6 +1,7 @@
 import os
+from stereo_screen import print_screen
 
-bar_width = 54
+BAR_WIDTH = 54
 
 def gear_indicator(gear, bar_width):
     gears = ['NONE', '1st', '2nd', '3rd', '4th']
@@ -49,8 +50,8 @@ def gear_indicator(gear, bar_width):
     return header, fill
 
 def progress_bar(bar_data):
-    bar_fill = int((min(bar_data, 100) / 100) * bar_width)
-    bar      = '\u2588' * bar_fill + '\u2591' * (bar_width - bar_fill)
+    bar_fill = int((min(bar_data, 100) / 100) * BAR_WIDTH)
+    bar      = '\u2588' * bar_fill + '\u2591' * (BAR_WIDTH - bar_fill)
     return bar
 
 def render_terminal(data_store):
@@ -65,7 +66,7 @@ def render_terminal(data_store):
     pi_cpu_temp = data_store.get('PI CPU Temperature')
     pi_cpu_usage = data_store.get('PI CPU Usage')
     pi_ram_usage = data_store.get('PI RAM Usage')
-    gear_header, gear_fill = gear_indicator(gear, bar_width)
+    gear_header, gear_fill = gear_indicator(gear, BAR_WIDTH)
 
     # Pi temp status
     if pi_cpu_temp is None:
@@ -73,35 +74,22 @@ def render_terminal(data_store):
     else:
         pi_str = f'{pi_cpu_temp}C'
 
-    # Build lines - each must fit inside 58 chars (60 minus 2 border chars)
-    WIDTH = 56
-    divider = '+' + '-' * WIDTH + '+'
-    altdivider = '-' + '+' * WIDTH + '-'
-
-    def row(text=''):
-        # Pad or truncate to exactly WIDTH chars
-        return '|' + text.ljust(WIDTH)[:WIDTH] + '|'
+    divider = '-' * BAR_WIDTH
 
     lines = []
+    lines.append(gear_header)
+    lines.append(gear_fill)
     lines.append(divider)
-    lines.append(row(f' {gear_header}'))
-    lines.append(row(f' {gear_fill}'))
+    lines.append(f'LOAD: {load}%')
+    lines.append(progress_bar(load))
+    lines.append(f'THROTTLE: {throttle}%')
+    lines.append(progress_bar(throttle))
     lines.append(divider)
-    lines.append(row(f' LOAD: {load}%'))
-    lines.append(row(f' {progress_bar(load)}'))
-    lines.append(row(f' THROTTLE: {throttle}%'))
-    lines.append(row(f' {progress_bar(throttle)}'))
-    lines.append(divider)
-    lines.append(row(f' PI Temperature: {pi_str}'))
-    lines.append(row(f' {progress_bar(pi_cpu_temp)}'))
-    lines.append(row(f' CPU: {pi_cpu_usage}%'))
-    lines.append(row(f' {progress_bar(pi_cpu_usage)}'))
-    lines.append(row(f' RAM: {pi_ram_usage}%'))
-    lines.append(row(f' {progress_bar(pi_ram_usage)}'))
-    lines.append(divider)
-    lines.append(altdivider)
-    lines.append(divider)
-    lines.append(altdivider)
+    lines.append(f' PI Temperature: {pi_str}')
+    lines.append(progress_bar(pi_cpu_temp))
+    lines.append(f'CPU: {pi_cpu_usage}%')
+    lines.append(progress_bar(pi_cpu_usage))
+    lines.append(f'RAM: {pi_ram_usage}%')
+    lines.append(progress_bar(pi_ram_usage))
 
-    for line in lines:
-        print(line)
+    print_screen(lines)

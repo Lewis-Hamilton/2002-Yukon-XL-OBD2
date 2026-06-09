@@ -29,7 +29,6 @@ def csv_logger(csv_queue, all_data, args):
     with open(csv_name, "w", newline="") as csvfile:
         thewriter = csv.DictWriter(csvfile, fieldnames=column_names)
         thewriter.writeheader()
-        print(f"Logging data to '{csv_name}'...")
         
         while True:
             try:

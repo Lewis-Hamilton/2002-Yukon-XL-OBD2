@@ -22,9 +22,7 @@ def obd_worker(connection, all_data, data_store, csv_queue):
         "medium": 2.5,
         "slow": 10.0
     }
-    
-    print("OBD worker thread started")
-    
+        
     while True:
         try:
             current_time = time.time()
