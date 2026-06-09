@@ -46,7 +46,7 @@ def convert_to_number(dirty_string):
 
 def create_logging_dir():
     if os.path.exists("./logged_data"):
-        print("Logging directory exists")
+        return None
     else:
         print("Logging directory does not exist, creating now")   
         os.mkdir("./logged_data")
