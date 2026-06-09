@@ -12,15 +12,23 @@ def row(text=''):
     return '| ' + text.ljust(INNER_WIDTH - 1)[:INNER_WIDTH - 1] + '|'
 
 def print_screen(lines):
-    os.system('clear')
-    print(divider)  # Top border
+    # Move cursor to top-left without clearing
+    print('\033[H', end='')
     
+    output = []
+    output.append(divider)
     for line in lines[:INNER_HEIGHT]:
-        print(row(line))  # Wrap each line in border
-    
-    # Pad remaining rows
+        output.append(row(line))
     remaining = INNER_HEIGHT - len(lines)
     for _ in range(remaining):
-        print(row())
+        output.append(row())
+    output.append(divider)
     
-    print(divider)  # Bottom border
+    # Print everything at once to minimize flicker
+    print('\n'.join(output), end='', flush=True)
+
+def hide_cursor():
+    print('\033[?25l', end='', flush=True)
+
+def show_cursor():
+    print('\033[?25h', end='', flush=True)

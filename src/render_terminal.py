@@ -1,4 +1,4 @@
-import os
+import time
 from stereo_screen import print_screen
 
 BAR_WIDTH = 54
@@ -58,7 +58,6 @@ def render_terminal(data_store):
     """
     Render gauge data as readable terminal text.
     """
-    os.system('clear')
 
     throttle = data_store.get('Throttle Position', 0)
     load     = data_store.get('Engine Load', 0)
@@ -93,3 +92,30 @@ def render_terminal(data_store):
     lines.append(progress_bar(pi_ram_usage))
 
     print_screen(lines)
+
+def data_animation():
+    """Sweep all bars from 0 to 100 and back, cycle through gears"""
+    gears = ['N/P', '1st', '2nd', '3rd', '4th (OD)', '3rd', '2nd', '1st', 'N/P']
+    steps = list(range(0, 101, 5)) + list(range(100, -1, -5))
+    
+    for i, value in enumerate(steps):
+        fake_store = {
+            'Engine Load': 0,
+            'Throttle Position': 0,
+            'PI CPU Temperature': 0,
+            'PI CPU Usage': 0,
+            'PI RAM Usage': 0,
+            'Estimated Gear': 'N/P',
+        }
+        fake_store['Engine Load'] = value
+        fake_store['Throttle Position'] = value
+        fake_store['PI CPU Temperature'] = value
+        fake_store['PI CPU Usage'] = value
+        fake_store['PI RAM Usage'] = value
+        
+        # Cycle through gears based on progress
+        gear_index = int((i / len(steps)) * len(gears))
+        fake_store['Estimated Gear'] = gears[min(gear_index, len(gears) - 1)]
+        
+        render_terminal(fake_store)
+        time.sleep(0.09)
