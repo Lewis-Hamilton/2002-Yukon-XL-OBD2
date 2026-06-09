@@ -4,7 +4,7 @@ from stereo_screen import print_screen, INNER_WIDTH, INNER_HEIGHT
 
 DELAY = 1
 
-def startup_screen():
+def startup_screen(connect_thread):
     # Perfectly symmetrical 15-character wide G
     G = [
         "░░░░░░░░░░░░░░░",
@@ -56,6 +56,7 @@ def startup_screen():
 
     letter_height = len(G)
     v_pad = (INNER_HEIGHT - letter_height) // 2
+    blank = [' ' * len(G[0])] * letter_height
 
     def make_frame(g_lines, m_lines, c_lines):
         lines = [''] * v_pad
@@ -65,8 +66,6 @@ def startup_screen():
         lines += [''] * v_pad
         return lines
 
-    blank = [' ' * len(G[0])] * letter_height
-
     # Show G
     print_screen(make_frame(G, blank, blank))
     time.sleep(DELAY)
@@ -75,6 +74,7 @@ def startup_screen():
     print_screen(make_frame(G, M, blank))
     time.sleep(DELAY)
 
-    # Show G + M + C
+    # Show G + M + C and wait for connection
     print_screen(make_frame(G, M, C))
-    time.sleep(DELAY * 2)
+    while connect_thread.is_alive():
+        time.sleep(0.5)
