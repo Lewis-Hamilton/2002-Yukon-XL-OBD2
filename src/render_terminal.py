@@ -84,7 +84,7 @@ def render_terminal(data_store):
     lines.append(f'THROTTLE: {throttle}%')
     lines.append(progress_bar(throttle))
     lines.append(divider)
-    lines.append(f' PI Temperature: {pi_str}')
+    lines.append(f'PI Temperature: {pi_str}')
     lines.append(progress_bar(pi_cpu_temp))
     lines.append(f'CPU: {pi_cpu_usage}%')
     lines.append(progress_bar(pi_cpu_usage))
@@ -118,4 +118,4 @@ def data_animation():
         fake_store['Estimated Gear'] = gears[min(gear_index, len(gears) - 1)]
         
         render_terminal(fake_store)
-        time.sleep(0.09)
+        time.sleep(0.07)
