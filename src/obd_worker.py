@@ -40,6 +40,12 @@ def obd_worker(connection, all_data, data_store, csv_queue):
                     data_store[data.name] = val
                     last_update_times[data.name] = current_time
             
+            data_store["Estimated Gear"] = estimate_gear(
+                data_store.get("RPM", 0),
+                data_store.get("Speed", 0),
+                data_store.get("Engine Load", 0)
+            )
+
             # Write to CSV every 1 second
             if current_time - last_csv_write >= 1.0:
                 data_row = {"Time": datetime.now().time()}
@@ -54,10 +60,5 @@ def obd_worker(connection, all_data, data_store, csv_queue):
             
         except Exception as e:
             print(f"OBD Thread Error: {e}")
-            time.sleep(1)
+            break
 
-        data_store["Estimated Gear"] = estimate_gear(
-        data_store.get("RPM", 0),
-        data_store.get("Speed", 0),
-        data_store.get("Engine Load", 0)
-        )
