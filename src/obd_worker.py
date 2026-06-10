@@ -33,38 +33,36 @@ def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
                 time_since_update = current_time - last_update_times[data.name]
                 interval = priority_intervals.get(data.priority, None)
                 
-                if interval is None:
-                    continue
-                # Should we update this sensor now?
-                elif time_since_update >= interval:
-                    val = data.response  # Query the car
+                if interval is not None and time_since_update >= interval:
+                    val = data.response
 
                     if val is not None:
                         local_updates[data.name] = val
+                        last_update_times[data.name] = current_time
                     else:
                         pass
-
-                    last_update_times[data.name] = current_time
-
-            current_rpm = local_updates.get("RPM", data_store.get("RPM", 0))
-            current_speed = local_updates.get("Speed", data_store.get("Speed", 0))
-            current_load = local_updates.get("Engine Load", data_store.get("Engine Load", 0))
-
-            if current_rpm is not None and current_speed is not None:
-                local_updates["Estimated Gear"] = estimate_gear(current_rpm, current_speed, current_load)
-            else:
-                local_updates["Estimated Gear"] = data_store.get("Estimated Gear", "N/P")
 
             if local_updates:
                 with data_lock:
                     data_store.update(local_updates)
+            
+            with data_lock:
+                current_rpm = local_updates.get("RPM", data_store.get("RPM", 0))
+                current_speed = local_updates.get("Speed", data_store.get("Speed", 0))
+                current_load = local_updates.get("Engine Load", data_store.get("Engine Load", 0))
+
+            if current_rpm is not None and current_speed is not None:
+                calculated_gear = estimate_gear(current_rpm, current_speed, current_load)
+                with data_lock:
+                    data_store["Estimated Gear"] = calculated_gear
 
             # Write to CSV every 1 second
             if current_time - last_csv_write >= 1.0:
                 data_row = {"Time": datetime.now().time()}
-                
-                for data in all_data:
-                    data_row[f"{data.name} ({data.unit})"] = data_store.get(data.name, 0)
+
+                with data_lock:
+                    for data in all_data:
+                        data_row[f"{data.name} ({data.unit})"] = data_store.get(data.name, 0)
                 
                 csv_queue.put(data_row)  # Send to CSV thread
                 last_csv_write = current_time
