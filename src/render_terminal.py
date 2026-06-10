@@ -30,22 +30,22 @@ def gear_indicator(gear, bar_width):
 
     widths = [na_width, base, base, base, base]
 
-    header = '|'
-    fill   = '|'
+    header = '┃'
+    fill   = '┃'
 
     for i, (g, w) in enumerate(zip(gears, widths)):
         dashes = w - len(g)
         left   = dashes // 2
         right  = dashes // 2
-        header += '-' * left + g + '-' * right
+        header += '━' * left + g + '━' * right
 
         if i == active:
             fill += '\u2588' * w
         else:
             fill += ' ' * w
 
-        header += '|'
-        fill   += '|'
+        header += '┃'
+        fill   += '┃'
 
     return header, fill
 
@@ -73,7 +73,7 @@ def render_terminal(data_store):
     else:
         pi_str = f'{pi_cpu_temp}C'
 
-    divider = '-' * BAR_WIDTH
+    divider = '━' * BAR_WIDTH
 
     lines = []
     lines.append(gear_header)
