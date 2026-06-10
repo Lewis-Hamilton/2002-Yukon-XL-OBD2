@@ -38,14 +38,22 @@ def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
                 # Should we update this sensor now?
                 elif time_since_update >= interval:
                     val = data.response  # Query the car
-                    data_store[data.name] = val
+
+                    if val is not None:
+                        local_updates[data.name] = val
+                    else:
+                        pass
+
                     last_update_times[data.name] = current_time
 
             current_rpm = local_updates.get("RPM", data_store.get("RPM", 0))
             current_speed = local_updates.get("Speed", data_store.get("Speed", 0))
             current_load = local_updates.get("Engine Load", data_store.get("Engine Load", 0))
 
-            local_updates["Estimated Gear"] = estimate_gear(current_rpm, current_speed, current_load)
+            if current_rpm is not None and current_speed is not None:
+                local_updates["Estimated Gear"] = estimate_gear(current_rpm, current_speed, current_load)
+            else:
+                local_updates["Estimated Gear"] = data_store.get("Estimated Gear", "N/P")
 
             if local_updates:
                 with data_lock:
