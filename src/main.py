@@ -86,5 +86,6 @@ finally:
     show_cursor()
     csv_queue.put(None)  # Tell CSV thread to stop
     time.sleep(0.5)      # Give CSV thread time to finish
-    connection.close()
+    if connection:
+        connection.close()
     print("Connection closed. Script finished.")
