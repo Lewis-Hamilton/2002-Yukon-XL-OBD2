@@ -14,7 +14,7 @@ from startup_screen import startup_screen
 
 args = parser.parse_args()
 
-if args.testing == True:
+if args.testing:
     import fake_obd as obd
 else:
     import obd
