@@ -2,7 +2,7 @@ import time
 from datetime import datetime
 from gear_calc import estimate_gear
 
-def obd_worker(connection, all_data, data_store, csv_queue):
+def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
     """
     OBD worker thread that queries sensors based on priority.
     
@@ -26,6 +26,7 @@ def obd_worker(connection, all_data, data_store, csv_queue):
     while True:
         try:
             current_time = time.time()
+            local_updates = {}
             
             # Update sensors based on their priority
             for data in all_data:
@@ -39,12 +40,16 @@ def obd_worker(connection, all_data, data_store, csv_queue):
                     val = data.response  # Query the car
                     data_store[data.name] = val
                     last_update_times[data.name] = current_time
-            
-            data_store["Estimated Gear"] = estimate_gear(
-                data_store.get("RPM", 0),
-                data_store.get("Speed", 0),
-                data_store.get("Engine Load", 0)
-            )
+
+            current_rpm = local_updates.get("RPM", data_store.get("RPM", 0))
+            current_speed = local_updates.get("Speed", data_store.get("Speed", 0))
+            current_load = local_updates.get("Engine Load", data_store.get("Engine Load", 0))
+
+            local_updates["Estimated Gear"] = estimate_gear(current_rpm, current_speed, current_load)
+
+            if local_updates:
+                with data_lock:
+                    data_store.update(local_updates)
 
             # Write to CSV every 1 second
             if current_time - last_csv_write >= 1.0:
