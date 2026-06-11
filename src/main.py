@@ -42,7 +42,8 @@ connect_thread = threading.Thread(target=connect_obd, daemon=True)
 connect_thread.start()
 
 # Play animation while connection happens, passing thread and csv check
-startup_screen(connect_thread)
+if not args.skip:
+    startup_screen(connect_thread)
 
 # Handle connection result
 if connection_error:

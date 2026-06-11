@@ -9,3 +9,8 @@ parser.add_argument(
     action="store_true",
     help="Will be either True or False",
 )
+
+parser.add_argument(
+    "--skip",
+    action="store_true",
+)
