@@ -27,7 +27,7 @@ def estimate_gear(rpm, speed, engine_load=None):
     RPM_PER_MPH_4TH = (AXLE_RATIO * GEAR_4_RATIO * CONSTANT) / TIRE_DIAMETER  # ~28
 
     # Handle edge cases
-    if speed < 5:
+    if speed < 1:
         return "N/P"  # Neutral/Park or too slow to determine
 
     if rpm == 0:
