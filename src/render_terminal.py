@@ -67,6 +67,30 @@ def gear_indicator(gear, bar_width):
 
     return header, fill
 
+_gear_stats = {
+    "current_gear": None,
+    "min_ratio": None,
+    "max_ratio": None,
+}
+
+def gear_ratio_stats(gear, rpm, speed):
+    if speed == 0 or rpm == 0:
+        return _gear_stats["min_ratio"], _gear_stats["max_ratio"]
+
+    ratio = rpm / speed
+
+    if gear != _gear_stats["current_gear"]:
+        _gear_stats["current_gear"] = gear
+        _gear_stats["min_ratio"] = ratio
+        _gear_stats["max_ratio"] = ratio
+    else:
+        if ratio < _gear_stats["min_ratio"]:
+            _gear_stats["min_ratio"] = ratio
+        if ratio > _gear_stats["max_ratio"]:
+            _gear_stats["max_ratio"] = ratio
+
+    return round(_gear_stats["min_ratio"], 2), round(_gear_stats["max_ratio"], 2)
+
 def progress_bar(bar_data):
     bar_fill = int((min(bar_data, 100) / 100) * BAR_WIDTH)
     bar      = '\u2588' * bar_fill + '\u2591' * (BAR_WIDTH - bar_fill)
@@ -89,8 +113,13 @@ def render_terminal(data_store):
     gear_header, gear_fill = gear_indicator(gear, BAR_WIDTH)
     idle_bar = idle_indicator(idle_status)
 
+    if test_rpm != 0 or test_speed != 0:
+        current_ratio = test_rpm / test_speed
+    else:
+        current_ratio = 0
     test_gear = estimate_gear(test_rpm, test_speed)
     gear_header2, gear_fill2 = gear_indicator(test_gear, BAR_WIDTH)
+    min_ratio, max_ratio = gear_ratio_stats(test_gear, test_rpm, test_speed)
 
     # Pi temp status
     if pi_cpu_temp is None:
@@ -116,8 +145,11 @@ def render_terminal(data_store):
     lines.append(divider)
     lines.append(f'PI Temperature: {pi_str}')
     lines.append(progress_bar(pi_cpu_temp))
-    lines.append(f'CPU: {pi_cpu_usage}%')
-    lines.append(progress_bar(pi_cpu_usage))
+    # lines.append(f'CPU: {pi_cpu_usage}%')
+    # lines.append(progress_bar(pi_cpu_usage))
+    lines.append(f'Current Ratio: {current_ratio}')
+    lines.append(f'Min Ratio: {min_ratio}')
+    lines.append(f'Max Ratio: {max_ratio}')
     # lines.append(f'RAM: {pi_ram_usage}%')
     # lines.append(progress_bar(pi_ram_usage))
 
