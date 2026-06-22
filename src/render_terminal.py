@@ -1,6 +1,7 @@
 import time
 from stereo_screen import print_screen
 from idle_calc import idle_ready
+from gear_calc import estimate_gear
 
 BAR_WIDTH = 54
 
@@ -79,12 +80,17 @@ def render_terminal(data_store):
     throttle = data_store.get('Throttle Position', 0)
     load     = data_store.get('Engine Load', 0)
     gear     = data_store.get('Estimated Gear', '---')
+    test_rpm = data_store.get('RPM', 0)
+    test_speed = data_store.get('Speed', 0)
     idle_status = data_store.get('Idle Indicator')
     pi_cpu_temp = data_store.get('PI CPU Temperature')
     pi_cpu_usage = data_store.get('PI CPU Usage')
     pi_ram_usage = data_store.get('PI RAM Usage')
     gear_header, gear_fill = gear_indicator(gear, BAR_WIDTH)
     idle_bar = idle_indicator(idle_status)
+
+    test_gear = estimate_gear(test_rpm, test_speed)
+    gear_header2, gear_fill2 = gear_indicator(test_gear, BAR_WIDTH)
 
     # Pi temp status
     if pi_cpu_temp is None:
@@ -100,6 +106,8 @@ def render_terminal(data_store):
     lines.append(divider)
     lines.append(gear_header)
     lines.append(gear_fill)
+    lines.append(gear_header2)
+    lines.append(gear_fill2)
     lines.append(divider)
     lines.append(f'LOAD: {load}%')
     lines.append(progress_bar(load))
@@ -110,8 +118,8 @@ def render_terminal(data_store):
     lines.append(progress_bar(pi_cpu_temp))
     lines.append(f'CPU: {pi_cpu_usage}%')
     lines.append(progress_bar(pi_cpu_usage))
-    lines.append(f'RAM: {pi_ram_usage}%')
-    lines.append(progress_bar(pi_ram_usage))
+    # lines.append(f'RAM: {pi_ram_usage}%')
+    # lines.append(progress_bar(pi_ram_usage))
 
     print_screen(lines)
 
