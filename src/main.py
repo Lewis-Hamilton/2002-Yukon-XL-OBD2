@@ -85,6 +85,8 @@ try:
 except KeyboardInterrupt:
     print("\nStopping...")
 except Exception as e:
+    import traceback
+    traceback.print_exc()
     print(f"Fatal error: {e}")
 finally:
     show_cursor()
