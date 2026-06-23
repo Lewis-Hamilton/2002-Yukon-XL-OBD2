@@ -113,7 +113,7 @@ def render_terminal(data_store):
     gear_header, gear_fill = gear_indicator(gear, BAR_WIDTH)
     idle_bar = idle_indicator(idle_status)
 
-    if test_rpm != 0 or test_speed != 0:
+    if test_rpm != 0 and test_speed != 0:
         current_ratio = test_rpm / test_speed
         rounded_ratio = round(current_ratio, 2)
         test_gear = estimate_gear2(test_rpm, test_speed)
