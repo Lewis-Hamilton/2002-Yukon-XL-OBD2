@@ -28,6 +28,10 @@ def estimate_gear2(rpm, speed):
 
     # Calculate current ratio (RPM per MPH)
     current_ratio = rpm / speed
+    if current_ratio != 0:
+        rounded_ratio = round(current_ratio, 2)
+    else:
+        rounded_ratio = 0
 
     class Gear:
         def __init__(self, name, min, max):
@@ -45,7 +49,6 @@ def estimate_gear2(rpm, speed):
     # get rid of "OD" in the 4th name, stupid
 
     for gear in GEARS:
-        if gear.min <= current_ratio <= gear.max:
+        if gear.min <= rounded_ratio <= gear.max:
             return gear.name
-        else:
-            return "---"
+    return "---"

@@ -1,7 +1,7 @@
 import time
 from stereo_screen import print_screen
 from idle_calc import idle_ready
-from gear_calc import estimate_gear
+from gear_calc2 import estimate_gear2
 
 BAR_WIDTH = 54
 
@@ -115,9 +115,12 @@ def render_terminal(data_store):
 
     if test_rpm != 0 or test_speed != 0:
         current_ratio = test_rpm / test_speed
+        rounded_ratio = round(current_ratio, 2)
+        test_gear = estimate_gear2(test_rpm, test_speed)
     else:
-        current_ratio = 0
-    test_gear = estimate_gear(test_rpm, test_speed)
+        rounded_ratio = 0
+        test_gear = "---"
+
     gear_header2, gear_fill2 = gear_indicator(test_gear, BAR_WIDTH)
     min_ratio, max_ratio = gear_ratio_stats(test_gear, test_rpm, test_speed)
 
@@ -143,11 +146,13 @@ def render_terminal(data_store):
     lines.append(f'THROTTLE: {throttle}%')
     lines.append(progress_bar(throttle))
     lines.append(divider)
-    lines.append(f'PI Temperature: {pi_str}')
-    lines.append(progress_bar(pi_cpu_temp))
+    # lines.append(f'PI Temperature: {pi_str}')
+    # lines.append(progress_bar(pi_cpu_temp))
     # lines.append(f'CPU: {pi_cpu_usage}%')
     # lines.append(progress_bar(pi_cpu_usage))
-    lines.append(f'Current Ratio: {current_ratio}')
+    lines.append(f'Speed: {test_speed}')
+    lines.append(f'RPM: {test_rpm}')
+    lines.append(f'Current Ratio: {rounded_ratio}')
     lines.append(f'Min Ratio: {min_ratio}')
     lines.append(f'Max Ratio: {max_ratio}')
     # lines.append(f'RAM: {pi_ram_usage}%')
