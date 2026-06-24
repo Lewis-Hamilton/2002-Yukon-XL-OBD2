@@ -1,6 +1,7 @@
 import time
 from datetime import datetime
 from gear_calc import estimate_gear
+from idle_calc import idle_ready
 
 def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
     """
@@ -50,7 +51,9 @@ def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
                 current_load = local_updates.get("Engine Load", data_store.get("Engine Load", 0))
                 if current_rpm is not None and current_speed is not None:
                     calculated_gear = estimate_gear(current_rpm, current_speed, current_load)
+                    calculated_idle = idle_ready(current_rpm, current_speed)
                     data_store["Estimated Gear"] = calculated_gear
+                    data_store["Idle Indicator"] = calculated_idle
 
             # Write to CSV every 1 second
             if current_time - last_csv_write >= 1.0:
