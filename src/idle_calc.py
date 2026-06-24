@@ -3,9 +3,8 @@ from args import parser
 
 args = parser.parse_args()
 
-_below_idle_since = None
 IDLE_DELAY = 15
-STOP_DELAY = 5
+STOP_DELAY = 10
 
 _stopped_since = None
 _below_idle_since = None
