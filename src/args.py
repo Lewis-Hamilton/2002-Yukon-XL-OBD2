@@ -13,5 +13,5 @@ parser.add_argument(
 parser.add_argument(
     "--idle_rpm",
     type=int,
-    default=700
+    default=800
 )
