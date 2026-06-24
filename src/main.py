@@ -52,13 +52,14 @@ if connection is None:
     raise ConnectionError("OBD connection timed out")
 
 try:
+    data_lock = threading.Lock()
     data_store = {data.name: 0 for data in all_data}
     csv_queue = queue.Queue()
 
     # Start OBD Thread
     obd_thread = threading.Thread(
         target=obd_worker,
-        args=(connection, all_data, data_store, csv_queue),
+        args=(connection, all_data, data_store, data_lock, csv_queue),
         daemon=True
     )
     obd_thread.start()
@@ -75,7 +76,9 @@ try:
     data_animation()
 
     while True:
-        render_terminal(data_store)
+        with data_lock:
+            current_snapshot = data_store.copy()
+        render_terminal(current_snapshot)
         time.sleep(0.75)  # Need to update in obd_worker as well
 
 except KeyboardInterrupt:
@@ -87,5 +90,8 @@ finally:
     csv_queue.put(None)  # Tell CSV thread to stop
     time.sleep(0.5)      # Give CSV thread time to finish
     if connection:
-        connection.close()
+        try:
+            connection.close()
+        except Exception:
+            pass
     print("Connection closed. Script finished.")
