@@ -5,8 +5,7 @@ INNER_HEIGHT  = 18
 SCREEN_WIDTH  = 58
 INNER_WIDTH   = 56
 
-top_border    = '█' + '▀' * INNER_WIDTH + '█'
-bottom_border = '█' + '▄' * INNER_WIDTH + '█'
+top_bottom_border    = '█' + '━' * INNER_WIDTH + '█'
 
 def row(text=''):
     # return '| ' + text.ljust(INNER_WIDTH - 1)[:INNER_WIDTH - 1] + '|'
@@ -17,13 +16,13 @@ def print_screen(lines):
     print('\033[H', end='')
     
     output = []
-    output.append(top_border)
+    output.append(top_bottom_border)
     for line in lines[:INNER_HEIGHT]:
         output.append(row(line))
     remaining = INNER_HEIGHT - len(lines)
     for _ in range(remaining):
         output.append(row())
-    output.append(bottom_border)
+    output.append(top_bottom_border)
     
     # Print everything at once to minimize flicker
     print('\n'.join(output), end='', flush=True)
