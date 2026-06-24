@@ -1,4 +1,4 @@
-def estimate_gear(rpm, speed, engine_load=None):
+def estimate_gear(rpm, speed):
     """
     Estimate current gear based on RPM and speed.
     
@@ -10,21 +10,6 @@ def estimate_gear(rpm, speed, engine_load=None):
     Returns:
         str: Estimated gear ("1st", "2nd", "3rd", "4th (OD)", "N/P", or "---")
     """
-    # Vehicle specifications for 2002 Yukon XL
-    AXLE_RATIO = 3.73
-    TIRE_DIAMETER = 31.1  # inches
-    CONSTANT = 336.13
-
-    GEAR_1_RATIO = 3.06
-    GEAR_2_RATIO = 1.63
-    GEAR_3_RATIO = 1.00
-    GEAR_4_RATIO = 0.70
-
-    # Calculate theoretical RPM per MPH for each gear
-    RPM_PER_MPH_1ST = (AXLE_RATIO * GEAR_1_RATIO * CONSTANT) / TIRE_DIAMETER  # ~123
-    RPM_PER_MPH_2ND = (AXLE_RATIO * GEAR_2_RATIO * CONSTANT) / TIRE_DIAMETER  # ~65
-    RPM_PER_MPH_3RD = (AXLE_RATIO * GEAR_3_RATIO * CONSTANT) / TIRE_DIAMETER  # ~40
-    RPM_PER_MPH_4TH = (AXLE_RATIO * GEAR_4_RATIO * CONSTANT) / TIRE_DIAMETER  # ~28
 
     # Handle edge cases
     if speed < 1:
