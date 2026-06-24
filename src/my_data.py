@@ -94,6 +94,11 @@ FUEL_STATUS = ObdData(
     priority="slow",
 )
 
+IDLE_INDICATOR = AddedData(
+    name="Idle Indicator",
+    unit="",
+)
+
 INTAKE_PRESSURE = ObdData(
     name="Intake Pressure",
     cmd=obd.commands.INTAKE_PRESSURE,
@@ -299,6 +304,7 @@ all_data = [
     ENGINE_LOAD,
     ESTIMATED_GEAR,
     FUEL_STATUS,
+    IDLE_INDICATOR,
     INTAKE_PRESSURE,
     INTAKE_TEMP,
     LONG_FUEL_TRIM_1,

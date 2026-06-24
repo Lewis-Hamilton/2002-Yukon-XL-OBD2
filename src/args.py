@@ -9,3 +9,9 @@ parser.add_argument(
     action="store_true",
     help="Will be either True or False",
 )
+
+parser.add_argument(
+    "--idle_rpm",
+    type=int,
+    default=700
+)
