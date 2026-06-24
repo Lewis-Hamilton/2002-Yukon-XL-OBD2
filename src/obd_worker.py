@@ -48,10 +48,8 @@ def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
                 current_rpm = local_updates.get("RPM", data_store.get("RPM", 0))
                 current_speed = local_updates.get("Speed", data_store.get("Speed", 0))
                 current_load = local_updates.get("Engine Load", data_store.get("Engine Load", 0))
-
-            if current_rpm is not None and current_speed is not None:
-                calculated_gear = estimate_gear(current_rpm, current_speed, current_load)
-                with data_lock:
+                if current_rpm is not None and current_speed is not None:
+                    calculated_gear = estimate_gear(current_rpm, current_speed, current_load)
                     data_store["Estimated Gear"] = calculated_gear
 
             # Write to CSV every 1 second
