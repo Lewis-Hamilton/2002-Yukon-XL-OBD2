@@ -14,7 +14,7 @@ from startup_screen import startup_screen
 
 args = parser.parse_args()
 
-if args.testing == True:
+if args.testing:
     import fake_obd as obd
 else:
     import obd
@@ -86,5 +86,6 @@ finally:
     show_cursor()
     csv_queue.put(None)  # Tell CSV thread to stop
     time.sleep(0.5)      # Give CSV thread time to finish
-    connection.close()
+    if connection:
+        connection.close()
     print("Connection closed. Script finished.")
