@@ -3,6 +3,22 @@ from stereo_screen import print_screen
 
 BAR_WIDTH = 54
 
+def loading_bar():
+    BLOCK_WIDTH = 20
+    BAR_SPEED = 30
+    travel = BAR_WIDTH - BLOCK_WIDTH
+    period = travel * 2
+    position = int(time.time() * BAR_SPEED) % period
+    if position >= travel:
+        position = period - position
+    return '\u2591' * position + '\u2588' * BLOCK_WIDTH + '\u2591' * (BAR_WIDTH - BLOCK_WIDTH - position)
+
+def idle_indicator(idle_status):
+    if idle_status:
+        return '\u2588' * BAR_WIDTH
+    else:
+        return loading_bar()
+
 def gear_indicator(gear, bar_width):
     gears = ['NONE', '1st', '2nd', '3rd', '4th']
     gear_map = {
@@ -62,10 +78,12 @@ def render_terminal(data_store):
     throttle = data_store.get('Throttle Position', 0)
     load     = data_store.get('Engine Load', 0)
     gear     = data_store.get('Estimated Gear', '---')
+    idle_status = data_store.get('Idle Indicator')
     pi_cpu_temp = data_store.get('PI CPU Temperature')
     pi_cpu_usage = data_store.get('PI CPU Usage')
     pi_ram_usage = data_store.get('PI RAM Usage')
     gear_header, gear_fill = gear_indicator(gear, BAR_WIDTH)
+    idle_bar = idle_indicator(idle_status)
 
     # Pi temp status
     if pi_cpu_temp is None:
@@ -76,6 +94,9 @@ def render_terminal(data_store):
     divider = '━' * BAR_WIDTH
 
     lines = []
+    lines.append("Idle Status")
+    lines.append(idle_bar)
+    lines.append(divider)
     lines.append(gear_header)
     lines.append(gear_fill)
     lines.append(divider)
