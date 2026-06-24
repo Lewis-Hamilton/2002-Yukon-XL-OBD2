@@ -1,4 +1,4 @@
-def estimate_gear2(rpm, speed):
+def estimate_gear(rpm, speed):
     """
     Estimate current gear based on RPM and speed.
     
