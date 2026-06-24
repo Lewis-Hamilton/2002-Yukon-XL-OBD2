@@ -20,7 +20,7 @@ def estimate_gear2(rpm, speed):
     GEAR_4_RATIO = 0.70
 
     # Handle edge cases
-    if speed < 5:
+    if speed < 1:
         return "N/P"  # Neutral/Park or too slow to determine
 
     if rpm == 0:
