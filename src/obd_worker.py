@@ -39,8 +39,6 @@ def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
                     if val is not None:
                         local_updates[data.name] = val
                         last_update_times[data.name] = current_time
-                    else:
-                        pass
 
             if local_updates:
                 with data_lock:
@@ -71,5 +69,6 @@ def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
             
         except Exception as e:
             print(f"OBD Thread Error: {e}")
+            # Clanker says continue or time.sleep(1) would be better, but I don't want to spam
             break
 
