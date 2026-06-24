@@ -79,7 +79,7 @@ try:
         with data_lock:
             current_snapshot = data_store.copy()
         render_terminal(current_snapshot)
-        time.sleep(0.1)  # Need to update in obd_worker as well
+        time.sleep(0.1)  # How fast to draw the output
 
 except KeyboardInterrupt:
     print("\nStopping...")
