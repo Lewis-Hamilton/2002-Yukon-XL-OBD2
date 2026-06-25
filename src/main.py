@@ -57,37 +57,8 @@ try:
     csv_queue = queue.Queue()
 
     if args.manual_testing:
-        from flask import Flask, request, jsonify
-        import logging
-        flask_app = Flask(__name__, static_folder='static')
-
-        @flask_app.route('/')
-        def index():
-            return flask_app.send_static_file('controls.html')
-
-        @flask_app.route('/set', methods=['POST'])
-        def set_value():
-            key = request.json.get('key')
-            val = request.json.get('value')
-            with data_lock:
-                data_store[key] = val
-            return jsonify({"ok": True})
-
-        @flask_app.route('/state', methods=['GET'])
-        def get_state():
-            with data_lock:
-                return jsonify(data_store.copy())
-        
-        log = logging.getLogger('werkzeug')
-        log.setLevel(logging.ERROR)
-        flask_app.logger.setLevel(logging.ERROR)
-        logging.getLogger('flask').setLevel(logging.ERROR)
-
-        flask_thread = threading.Thread(
-            target=lambda: flask_app.run(host='0.0.0.0', port=5000, use_reloader=False),
-            daemon=True
-        )
-        flask_thread.start()
+        from flask_server import start_flask
+        start_flask(data_store, data_lock)
 
     # Start OBD Thread
     obd_thread = threading.Thread(
