@@ -24,11 +24,15 @@
 <h1>OBD test controls</h1>
 
 <div class="card">
-  <h2>Engine</h2>
   <div class="control">
     <label>RPM</label>
     <input type="range" id="rpm" min="0" max="6000" step="50" value="800">
     <span class="val" id="rpm-val">800</span>
+  </div>
+    <div class="control">
+    <label>Speed</label>
+    <input type="range" id="speed" min="0" max="120" step="1" value="0">
+    <span class="val" id="speed-val">0 mph</span>
   </div>
   <div class="control">
     <label>Load</label>
@@ -44,15 +48,6 @@
     <label>Coolant</label>
     <input type="range" id="coolant" min="32" max="260" step="1" value="195">
     <span class="val" id="coolant-val">195°F</span>
-  </div>
-</div>
-
-<div class="card">
-  <h2>Vehicle</h2>
-  <div class="control">
-    <label>Speed</label>
-    <input type="range" id="speed" min="0" max="120" step="1" value="0">
-    <span class="val" id="speed-val">0 mph</span>
   </div>
 </div>
 
