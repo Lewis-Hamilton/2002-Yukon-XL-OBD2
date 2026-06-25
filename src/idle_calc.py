@@ -4,7 +4,7 @@ from args import parser
 args = parser.parse_args()
 
 IDLE_DELAY = 15
-STOP_DELAY = 10
+STOP_DELAY = 7
 
 _stopped_since = None
 _below_idle_since = None
@@ -22,7 +22,7 @@ def idle_ready(rpm, speed):
 
     if time.time() - _stopped_since < STOP_DELAY:
         # waiting to slow down, don't check idle
-        return False
+        return True
 
     if rpm < args.idle_rpm:
         if _below_idle_since is None:
