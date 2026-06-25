@@ -30,9 +30,13 @@ def estimate_gear2(rpm, speed):
             self.min = min
             self.max = max
 
+# Ratios Tested
+# 41 is too low for 3rd gear min, switched to 42
+# 95 is too low for 1st gear min, switched to 110
+
     GEARS = [
-        Gear("1st", 96, 9999),
-        Gear("2nd", 69, 95.99),
+        Gear("1st", 110, 9999),
+        Gear("2nd", 69, 109.99),
         Gear("3rd", 42, 68.99),
         Gear("4th (OD)", 0, 41.99),
     ]
