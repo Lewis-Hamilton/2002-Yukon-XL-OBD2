@@ -15,3 +15,9 @@ parser.add_argument(
     type=int,
     default=800
 )
+
+parser.add_argument(
+    "--manual_testing",
+    action="store_true",
+    help="True or False",
+)
