@@ -15,7 +15,7 @@ def idle_ready(rpm, speed):
 
     if speed > 0:
         _stopped_since = None
-        _below_idle_since = None
+        _below_idle_since = IDLE_DELAY
         _prev_speed = speed
         return True
 
