@@ -5,7 +5,7 @@ import random
 
 args = parser.parse_args()
 
-if args.testing == True:
+if args.testing == True or args.manual_testing == True:
     import fake_obd as obd
     connection = obd.FakeOBD()
 
