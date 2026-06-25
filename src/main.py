@@ -83,7 +83,7 @@ try:
         with data_lock:
             current_snapshot = data_store.copy()
         render_terminal(current_snapshot)
-        time.sleep(0.1)  # How fast to draw the output
+        time.sleep(0.05)  # How fast to draw the output
 
 except KeyboardInterrupt:
     print("\nStopping...")
