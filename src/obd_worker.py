@@ -2,6 +2,9 @@ import time
 from datetime import datetime
 from gear_calc import estimate_gear
 from idle_calc import idle_ready
+from args import parser
+
+args = parser.parse_args()
 
 def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
     """
@@ -35,11 +38,12 @@ def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
                 interval = priority_intervals.get(data.priority, None)
                 
                 if interval is not None and time_since_update >= interval:
-                    val = data.response
+                    if not args.manual_testing:
+                        val = data.response
 
-                    if val is not None:
-                        local_updates[data.name] = val
-                        last_update_times[data.name] = current_time
+                        if val is not None:
+                            local_updates[data.name] = val
+                            last_update_times[data.name] = current_time
 
             if local_updates:
                 with data_lock:

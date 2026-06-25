@@ -14,7 +14,7 @@ from startup_screen import startup_screen
 
 args = parser.parse_args()
 
-if args.testing:
+if args.testing or args.manual_testing:
     import fake_obd as obd
 else:
     import obd
@@ -29,7 +29,7 @@ connection_error = None
 def connect_obd():
     global connection, connection_error
     try:
-        if args.testing == True:
+        if args.testing == True or args.manual_testing == True:
             connection = obd.FakeOBD()
         else:
             connection = obd.OBD()
@@ -55,6 +55,10 @@ try:
     data_lock = threading.Lock()
     data_store = {data.name: 0 for data in all_data}
     csv_queue = queue.Queue()
+
+    if args.manual_testing:
+        from flask_server import start_flask
+        start_flask(data_store, data_lock)
 
     # Start OBD Thread
     obd_thread = threading.Thread(
