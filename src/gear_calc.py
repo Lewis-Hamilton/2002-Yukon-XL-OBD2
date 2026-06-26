@@ -31,8 +31,8 @@ def estimate_gear(rpm, speed):
             self.max = max
 
     GEARS = [
-        Gear("1st", 120, 9999),
-        Gear("2nd", 65, 119.99),
+        Gear("1st", 130, 9999),
+        Gear("2nd", 65, 129.99),
         Gear("3rd", 45, 64.99),
         Gear("4th (OD)", 0, 44.99),
     ]

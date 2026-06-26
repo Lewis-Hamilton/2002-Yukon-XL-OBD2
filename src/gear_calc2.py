@@ -39,8 +39,8 @@ def estimate_gear2(rpm, speed):
 # correct 2nd min is 69 but going radical to try stuff
 
     GEARS = [
-        Gear("1st", 130, 9999),
-        Gear("2nd", 75, 129.99),
+        Gear("1st", 125, 9999),
+        Gear("2nd", 75, 124.99),
         Gear("3rd", 35, 74.99),
         Gear("4th (OD)", 0, 34.99),
     ]
