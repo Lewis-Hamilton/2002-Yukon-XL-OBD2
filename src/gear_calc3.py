@@ -1,4 +1,4 @@
-def estimate_gear2(rpm, speed):
+def estimate_gear3(rpm, speed):
     """
     Estimate current gear based on RPM and speed.
     
@@ -30,19 +30,11 @@ def estimate_gear2(rpm, speed):
             self.min = min
             self.max = max
 
-# Ratios Tested
-# 41 is too low for 3rd gear min, switched to 42
-# 95 is too low for 1st gear min, switched to 110
-# 110 is also too low for 1st gear min, switched to 120
-# Correct 4th max is 41.99 but going radical now to try stuff
-# I think 41.99 is too high for max 4th gear, trying 34.99
-# correct 2nd min is 69 but going radical to try stuff
-
     GEARS = [
-        Gear("1st", 130, 9999),
-        Gear("2nd", 75, 129.99),
-        Gear("3rd", 35, 74.99),
-        Gear("4th (OD)", 0, 34.99),
+        Gear("1st", 125, 9999),
+        Gear("2nd", 70, 124.99),
+        Gear("3rd", 40, 69.99),
+        Gear("4th (OD)", 0, 39.99),
     ]
 
     # get rid of "OD" in the 4th name, stupid
