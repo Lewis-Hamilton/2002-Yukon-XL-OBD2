@@ -3,7 +3,7 @@ from args import parser
 
 args = parser.parse_args()
 
-IDLE_DELAY = 15
+IDLE_DELAY = 20
 STOP_DELAY = 5
 
 _stopped_since = 0
