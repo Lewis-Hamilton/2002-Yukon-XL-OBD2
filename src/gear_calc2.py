@@ -34,12 +34,14 @@ def estimate_gear2(rpm, speed):
 # 41 is too low for 3rd gear min, switched to 42
 # 95 is too low for 1st gear min, switched to 110
 # 110 is also too low for 1st gear min, switched to 120
+# Correct 4th max is 41.99 but going radical now to try stuff
+# I think 41.99 is too high for max 4th gear, trying 34.99
 
     GEARS = [
         Gear("1st", 130, 9999),
         Gear("2nd", 69, 129.99),
-        Gear("3rd", 42, 68.99),
-        Gear("4th (OD)", 0, 41.99),
+        Gear("3rd", 35, 68.99),
+        Gear("4th (OD)", 0, 34.99),
     ]
 
     # get rid of "OD" in the 4th name, stupid
