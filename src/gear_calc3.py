@@ -32,8 +32,8 @@ def estimate_gear3(rpm, speed):
 
     GEARS = [
         Gear("1st", 140, 9999),
-        Gear("2nd", 70, 139.99),
-        Gear("3rd", 40, 69.99),
+        Gear("2nd", 80, 139.99),
+        Gear("3rd", 40, 79.99),
         Gear("4th (OD)", 0, 39.99),
     ]
 
