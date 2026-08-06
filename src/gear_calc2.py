@@ -38,11 +38,36 @@ def estimate_gear2(rpm, speed):
 # I think 41.99 is too high for max 4th gear, trying 34.99
 # correct 2nd min is 69 but going radical to try stuff
 
+# For now this function will be the closest to accurate ratios
+# Will be copied over to the real function when done testing
+
+# I think 125 is too late still, 120 might be ideal
+
+# Commenting this out for now, using ai estimate gears
+    # GEARS = [
+    #     Gear("1st", 125, 9999),
+    #     Gear("2nd", 73, 124.99),
+    #     Gear("3rd", 25, 72.99),
+    #     Gear("4th (OD)", 0, 24.99),
+    # ]
+
+# gemini estimation based on csv logged data analysis
+# With the torque converter
+# GEARS = [
+#     Gear("1st", 95.1, 9999),
+#     Gear("2nd", 58.1, 95.0),
+#     Gear("3rd (Unlocked)", 42.6, 58.0),
+#     Gear("3rd (LOCKED)", 37.1, 42.5),
+#     Gear("4th (Unlocked)", 30.6, 37.0),
+#     Gear("4th (LOCKED)", 0.0, 30.5),
+# ]
+
+# gemini estimation without torque converter
     GEARS = [
-        Gear("1st", 125, 9999),
-        Gear("2nd", 73, 124.99),
-        Gear("3rd", 25, 72.99),
-        Gear("4th (OD)", 0, 24.99),
+        Gear("1st", 95.1, 9999),
+        Gear("2nd", 58.1, 95.0),
+        Gear("3rd", 37.1, 58.0),
+        Gear("4th (OD)", 0.0, 37.0),
     ]
 
     # get rid of "OD" in the 4th name, stupid

@@ -30,11 +30,21 @@ def estimate_gear(rpm, speed):
             self.min = min
             self.max = max
 
+# For now this will be all the ratios that are too low
+# All of these gears should shift too early
+
+    # GEARS = [
+    #     Gear("1st", 130, 9999),
+    #     Gear("2nd", 75, 129.99),
+    #     Gear("3rd", 35, 74.99),
+    #     Gear("4th (OD)", 0, 34.99),
+    # ]
+
     GEARS = [
-        Gear("1st", 130, 9999),
-        Gear("2nd", 75, 129.99),
-        Gear("3rd", 35, 74.99),
-        Gear("4th (OD)", 0, 34.99),
+        Gear("1st", 80, 9999),
+        Gear("2nd", 40, 79.99),
+        Gear("3rd", 25, 39.99),
+        Gear("4th (OD)", 0, 24.99),
     ]
 
     # get rid of "OD" in the 4th name, stupid
