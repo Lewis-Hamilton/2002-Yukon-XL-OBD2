@@ -43,12 +43,13 @@ def estimate_gear3(rpm, speed):
     #     Gear("4th (OD)", 0, 49.99),
     # ]
 
-    GEARS = [
-        Gear("1st", 120, 9999),
-        Gear("2nd", 70, 119.99),
-        Gear("3rd", 45, 69.99),
-        Gear("4th (OD)", 0, 44.99),
-    ]
+# these were estimate based on ai gear
+    # GEARS = [
+    #     Gear("1st", 120, 9999),
+    #     Gear("2nd", 70, 119.99),
+    #     Gear("3rd", 45, 69.99),
+    #     Gear("4th (OD)", 0, 44.99),
+    # ]
 
     # get rid of "OD" in the 4th name, stupid
 

@@ -44,12 +44,13 @@ def estimate_gear2(rpm, speed):
 # I think 125 is too late still, 120 might be ideal
 
 # Commenting this out for now, using ai estimate gears
-    # GEARS = [
-    #     Gear("1st", 125, 9999),
-    #     Gear("2nd", 73, 124.99),
-    #     Gear("3rd", 25, 72.99),
-    #     Gear("4th (OD)", 0, 24.99),
-    # ]
+# ok now using this here
+    GEARS = [
+        Gear("1st", 125, 9999),
+        Gear("2nd", 73, 124.99),
+        Gear("3rd", 25, 72.99),
+        Gear("4th (OD)", 0, 24.99),
+    ]
 
 # gemini estimation based on csv logged data analysis
 # With the torque converter
@@ -63,12 +64,12 @@ def estimate_gear2(rpm, speed):
 # ]
 
 # gemini estimation without torque converter
-    GEARS = [
-        Gear("1st", 95.1, 9999),
-        Gear("2nd", 58.1, 95.0),
-        Gear("3rd", 37.1, 58.0),
-        Gear("4th (OD)", 0.0, 37.0),
-    ]
+    # GEARS = [
+    #     Gear("1st", 95.1, 9999),
+    #     Gear("2nd", 58.1, 95.0),
+    #     Gear("3rd", 37.1, 58.0),
+    #     Gear("4th (OD)", 0.0, 37.0),
+    # ]
 
     # get rid of "OD" in the 4th name, stupid
 

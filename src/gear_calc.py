@@ -40,11 +40,21 @@ def estimate_gear(rpm, speed):
     #     Gear("4th (OD)", 0, 34.99),
     # ]
 
+# lower ratio based on gemini suggustion in file2
+    # GEARS = [
+    #     Gear("1st", 80, 9999),
+    #     Gear("2nd", 40, 79.99),
+    #     Gear("3rd", 25, 39.99),
+    #     Gear("4th (OD)", 0, 24.99),
+    # ]
+
+    
+    # new gemini suggustion
     GEARS = [
-        Gear("1st", 80, 9999),
-        Gear("2nd", 40, 79.99),
-        Gear("3rd", 25, 39.99),
-        Gear("4th (OD)", 0, 24.99),
+        Gear("1st", 85.0, 9999.0),
+        Gear("2nd", 45.0, 84.99),
+        Gear("3rd", 37.0, 44.99),
+        Gear("4th (OD)", 0.0, 36.99),
     ]
 
     # get rid of "OD" in the 4th name, stupid
