@@ -7,6 +7,9 @@ Type=simple
 User=lewis
 WorkingDirectory=/home/lewis/2002-Yukon-XL-OBD2
 ExecStart=/home/lewis/2002-Yukon-XL-OBD2/.venv/bin/python3 /home/lewis/2002-Yukon-XL-OBD2/main.py
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=journal
+StandardError=journal
 Restart=on-failure
 RestartSec=5s
 
