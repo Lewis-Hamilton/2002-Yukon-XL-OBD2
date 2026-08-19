@@ -3,6 +3,8 @@ import os
 import time
 import queue
 import threading
+import RPi.GPIO as GPIO
+import subprocess
 from args import parser
 from utils import check_connection
 from my_data import all_data
@@ -11,6 +13,7 @@ from csv_logger import csv_logger
 from render_terminal import render_terminal, data_animation
 from stereo_screen import hide_cursor, show_cursor
 from startup_screen import startup_screen
+from shutdown import monitor_shutdown_button
 
 args = parser.parse_args()
 
@@ -21,6 +24,30 @@ else:
     
 os.system('clear')
 hide_cursor()
+
+# --- Pi Pin Definitions ---
+AUTO_START_PIN = 21  # Toggle switch to ground
+SHUTDOWN_PIN   = 20  # Pushbutton to ground
+
+# Setup GPIO
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(AUTO_START_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(SHUTDOWN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+if GPIO.input(AUTO_START_PIN) == GPIO.LOW:
+    # might want it to skip the start up screen here
+    print("\n==================================================")
+    print(" DEV MODE DETECTED (Switch Closed) ")
+    print(" Exiting auto-run service... Terminal ready.")
+    print("==================================================\n")
+    sys.exit(0)
+
+#this would show the startup screen like normal
+print("\nStarting 2002 Yukon XL Telemetry...")
+
+# Start button monitoring in a background thread
+shutdown_thread = threading.Thread(target=monitor_shutdown_button, daemon=True)
+shutdown_thread.start()
 
 # Set up connection variables
 connection = None
@@ -95,6 +122,7 @@ finally:
     show_cursor()
     csv_queue.put(None)  # Tell CSV thread to stop
     time.sleep(0.5)      # Give CSV thread time to finish
+    GPIO.cleanup()
     if connection:
         try:
             connection.close()
