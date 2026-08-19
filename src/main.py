@@ -34,10 +34,12 @@ GPIO.setmode(GPIO.BCM)
 GPIO.setup(AUTO_START_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 GPIO.setup(SHUTDOWN_PIN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-if GPIO.input(AUTO_START_PIN) == GPIO.LOW:
+is_dev_mode = (GPIO.input(AUTO_START_PIN) == GPIO.LOW)
+
+if is_dev_mode:
     # might want it to skip the start up screen here
     print("\n==================================================")
-    print(" DEV MODE DETECTED (Switch Closed) ")
+    print(" DEV MODE DETECTED AT BOOT (Switch Closed) ")
     print(" Exiting auto-run service... Terminal ready.")
     print("==================================================\n")
     sys.exit(0)
@@ -57,6 +59,9 @@ def monitor_shutdown_button():
             
             # Allow clean up of serial/logging if needed
             time.sleep(3)
+
+            # Stop the systemd service first so it won't auto-restart
+            subprocess.run(["sudo", "systemctl", "stop", "yukon.service"])
             
             # Execute system shutdown command
             subprocess.run(["sudo", "/sbin/poweroff"])

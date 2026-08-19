@@ -22,4 +22,4 @@ Auto Start script on boot
 Dev Switch
 
 1. run `sudo visudo`
-2. add this line `lewis ALL=(ALL) NOPASSWD: /sbin/poweroff` and save
+2. add this line `lewis ALL=(ALL) NOPASSWD: /sbin/poweroff, /usr/bin/systemctl stop yukon.service` and save
