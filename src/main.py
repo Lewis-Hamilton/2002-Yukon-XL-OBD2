@@ -3,6 +3,7 @@ import os
 import time
 import queue
 import threading
+import RPi.GPIO as GPIO
 import subprocess
 from args import parser
 from utils import check_connection
