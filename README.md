@@ -7,3 +7,11 @@ Start collecting data
 3. run `python3 src/get_commands.py` to get list of available commands for vehicle
 4. Add commands to `src/main.py`
 5. run `python3 src/main.py`
+
+Auto Start script on boot
+1. cd into dotfiles
+2. `sudo stow -d dotfiles -t / startup`
+3. `sudo systemctl daemon-reload`
+4. `sudo systemctl enable yukon.service`
+5. reboot
+6. will now run on boot
