@@ -1,0 +1,14 @@
+[Unit]
+Description=2002 Yukon XL OBD2 Telemetry Service
+After=multi-user.target
+
+[Service]
+Type=simple
+User=lewis
+WorkingDirectory=/home/lewis/2002-Yukon-XL-OBD2
+ExecStart=/home/lewis/2002-Yukon-XL-OBD2/venv/bin/python3 /home/lewis/2002-Yukon-XL-OBD2/main.py
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
