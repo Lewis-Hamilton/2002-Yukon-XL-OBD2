@@ -1,3 +1,5 @@
+import RPi.GPIO as GPIO
+
 def monitor_shutdown_button():
     while True:
         # Check if button is pressed (LOW)
