@@ -45,6 +45,25 @@ if GPIO.input(AUTO_START_PIN) == GPIO.LOW:
 #this would show the startup screen like normal
 print("\nStarting 2002 Yukon XL Telemetry...")
 
+def monitor_shutdown_button():
+    while True:
+        # Check if button is pressed (LOW)
+        # would be cool if this played the animation on the display in reverse
+        if GPIO.input(SHUTDOWN_PIN) == GPIO.LOW:
+            print("\n==================================================")
+            print(" SHUTDOWN BUTTON PRESSED! ")
+            print(" Stopping telemetry and powering down in 3s...")
+            print("==================================================\n")
+            
+            # Allow clean up of serial/logging if needed
+            time.sleep(3)
+            
+            # Execute system shutdown command
+            subprocess.run(["sudo", "/sbin/poweroff"])
+            break
+            
+        time.sleep(0.2)
+
 # Start button monitoring in a background thread
 shutdown_thread = threading.Thread(target=monitor_shutdown_button, daemon=True)
 shutdown_thread.start()
