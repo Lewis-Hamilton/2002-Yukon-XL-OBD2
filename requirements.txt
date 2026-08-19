@@ -2,3 +2,4 @@
 obd
 psutil
 flask
+RPi.GPIO>=0.7.0
