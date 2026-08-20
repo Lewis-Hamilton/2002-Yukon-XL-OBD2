@@ -1,5 +1,9 @@
-# my_app/__main__.py
+import sys
+
 from yukon_watcher.main import main
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.exit(0)
