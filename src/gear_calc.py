@@ -1,12 +1,12 @@
 def estimate_gear(rpm, speed, engine_load=None):
     """
     Estimate current gear based on RPM and speed.
-    
+
     Args:
         rpm: Current engine RPM
         speed: Current speed in MPH
         engine_load: Optional engine load percentage (for future refinement)
-    
+
     Returns:
         str: Estimated gear ("1st", "2nd", "3rd", "4th (OD)", "N/P", or "---")
     """

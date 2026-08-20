@@ -1,17 +1,20 @@
-from args import parser
-from gear_calc import estimate_gear
-from get_pi_data import get_pi_cpu_usage, get_pi_ram_usage, get_pi_cpu_temp
 import random
+
+from args import parser
+from get_pi_data import get_pi_cpu_temp, get_pi_cpu_usage, get_pi_ram_usage
 
 args = parser.parse_args()
 
 if args.testing == True or args.manual_testing == True:
     import fake_obd as obd
+
     connection = obd.FakeOBD()
 
 else:
     import obd
+
     connection = obd.OBD(portstr="/dev/ttyUSB0")
+
 
 class AddedData:
     def __init__(self, name, unit="", real_func=None, testing_func=None):
@@ -20,30 +23,41 @@ class AddedData:
         self.priority = "fast"
         self.real_func = real_func
         self.testing_func = testing_func or real_func
-    
+
     @property
     def response(self):
         if args.testing and self.testing_func:
             return self.testing_func()
         return self.real_func() if self.real_func else None
 
+
 ESTIMATED_GEAR = AddedData(name="Estimated Gear", unit="")
 
+
 class Conversion:
-    def __init__(self, amount, offset = 0):
+    def __init__(self, amount, offset=0):
         self.amount = amount
         self.offset = offset
 
+
 class ObdData:
-    def __init__(self, name, cmd, unit, priority, textToReplace = None, conversion = None,):
+    def __init__(
+        self,
+        name,
+        cmd,
+        unit,
+        priority,
+        textToReplace=None,
+        conversion=None,
+    ):
         self.name = name
         self.cmd = cmd
         self.unit = unit
         self.priority = priority
         self.textToReplace = textToReplace
         self.conversion = conversion
-    
-    @property 
+
+    @property
     def response(self):
         myresponse = connection.query(self.cmd)
         if self.textToReplace is not None:
@@ -51,12 +65,16 @@ class ObdData:
             cleanedResponse = stringResponse.replace(self.textToReplace, "")
             unConvertedResponse = float(cleanedResponse)
             if self.conversion is not None:
-                convertedResponse = unConvertedResponse * self.conversion.amount + self.conversion.offset
+                convertedResponse = (
+                    unConvertedResponse * self.conversion.amount
+                    + self.conversion.offset
+                )
                 return round(convertedResponse)
             else:
                 return round(unConvertedResponse)
-        else: 
+        else:
             return myresponse
+
 
 AUX_INPUT_STATUS = ObdData(
     name="Auxillary Input",
@@ -71,15 +89,15 @@ COOLANT_TEMP = ObdData(
     unit="Fahrenheit",
     priority="medium",
     textToReplace=" degree_Celsius",
-    conversion = Conversion(amount= 1.8, offset= 32) 
-    )
+    conversion=Conversion(amount=1.8, offset=32),
+)
 
 ENGINE_LOAD = ObdData(
     name="Engine Load",
     cmd=obd.commands.ENGINE_LOAD,
     unit="Percentage",
     priority="fast",
-    textToReplace=" percent"
+    textToReplace=" percent",
 )
 
 ESTIMATED_GEAR = AddedData(
@@ -104,7 +122,7 @@ INTAKE_PRESSURE = ObdData(
     cmd=obd.commands.INTAKE_PRESSURE,
     unit="kilopascal",
     priority="fast",
-    textToReplace=" kilopascal"
+    textToReplace=" kilopascal",
 )
 
 INTAKE_TEMP = ObdData(
@@ -112,7 +130,7 @@ INTAKE_TEMP = ObdData(
     cmd=obd.commands.INTAKE_TEMP,
     unit="Celsius",
     priority="fast",
-    textToReplace=" degree_Celsius"
+    textToReplace=" degree_Celsius",
 )
 
 LONG_FUEL_TRIM_1 = ObdData(
@@ -120,7 +138,7 @@ LONG_FUEL_TRIM_1 = ObdData(
     cmd=obd.commands.LONG_FUEL_TRIM_1,
     unit="Percentage",
     priority="medium",
-    textToReplace=" percent"
+    textToReplace=" percent",
 )
 
 LONG_FUEL_TRIM_2 = ObdData(
@@ -128,7 +146,7 @@ LONG_FUEL_TRIM_2 = ObdData(
     cmd=obd.commands.LONG_FUEL_TRIM_2,
     unit="Percentage",
     priority="medium",
-    textToReplace=" percent"
+    textToReplace=" percent",
 )
 
 MAF = ObdData(
@@ -136,7 +154,7 @@ MAF = ObdData(
     cmd=obd.commands.MAF,
     unit="Grams Per Second",
     priority="fast",
-    textToReplace=" gps"
+    textToReplace=" gps",
 )
 
 MIDS_A = ObdData(
@@ -151,7 +169,7 @@ O2_B1S1 = ObdData(
     cmd=obd.commands.O2_B1S1,
     unit="Volts",
     priority="fast",
-    textToReplace=" volt"
+    textToReplace=" volt",
 )
 
 O2_B1S2 = ObdData(
@@ -159,7 +177,7 @@ O2_B1S2 = ObdData(
     cmd=obd.commands.O2_B1S2,
     unit="Volts",
     priority="fast",
-    textToReplace=" volt"
+    textToReplace=" volt",
 )
 
 O2_B2S1 = ObdData(
@@ -167,7 +185,7 @@ O2_B2S1 = ObdData(
     cmd=obd.commands.O2_B2S1,
     unit="Volts",
     priority="fast",
-    textToReplace=" volt"
+    textToReplace=" volt",
 )
 
 O2_B2S2 = ObdData(
@@ -175,7 +193,7 @@ O2_B2S2 = ObdData(
     cmd=obd.commands.O2_B2S2,
     unit="Volts",
     priority="fast",
-    textToReplace=" volt"
+    textToReplace=" volt",
 )
 
 O2_SENSORS = ObdData(
@@ -196,22 +214,22 @@ PI_CPU_TEMP = AddedData(
     name="PI CPU Temperature",
     unit="Celsius",
     real_func=get_pi_cpu_temp,
-    testing_func=lambda: round(random.uniform(30, 85))
-    )
+    testing_func=lambda: round(random.uniform(30, 85)),
+)
 
 PI_CPU_USAGE = AddedData(
     name="PI CPU Usage",
     unit="Percentage",
     real_func=get_pi_cpu_usage,
-    testing_func=lambda: round(random.uniform(0, 100))
-    )
+    testing_func=lambda: round(random.uniform(0, 100)),
+)
 
 PI_RAM_USAGE = AddedData(
     name="PI RAM Usage",
     unit="Percentage",
     real_func=get_pi_ram_usage,
-    testing_func=lambda: round(random.uniform(0, 100))
-    )
+    testing_func=lambda: round(random.uniform(0, 100)),
+)
 
 PIDS_9A = ObdData(
     name="PIDS 9A",
@@ -223,7 +241,7 @@ PIDS_9A = ObdData(
 PIDS_A = ObdData(
     name="PIDS A",
     cmd=obd.commands.PIDS_A,
-    unit="Bitmask", 
+    unit="Bitmask",
     priority="slow",
 )
 
@@ -232,7 +250,7 @@ RPM = ObdData(
     cmd=obd.commands.RPM,
     unit="Revolutions Per Minute",
     priority="fast",
-    textToReplace=" revolutions_per_minute"
+    textToReplace=" revolutions_per_minute",
 )
 
 SHORT_FUEL_TRIM_1 = ObdData(
@@ -240,7 +258,7 @@ SHORT_FUEL_TRIM_1 = ObdData(
     cmd=obd.commands.SHORT_FUEL_TRIM_1,
     unit="Percent",
     priority="fast",
-    textToReplace=" percent"
+    textToReplace=" percent",
 )
 
 SHORT_FUEL_TRIM_2 = ObdData(
@@ -248,7 +266,7 @@ SHORT_FUEL_TRIM_2 = ObdData(
     cmd=obd.commands.SHORT_FUEL_TRIM_2,
     unit="Percent",
     priority="fast",
-    textToReplace=" percent"
+    textToReplace=" percent",
 )
 
 SPEED = ObdData(
@@ -257,7 +275,7 @@ SPEED = ObdData(
     unit="MPH",
     priority="fast",
     textToReplace=" kilometer_per_hour",
-    conversion= Conversion(amount= 0.621371)
+    conversion=Conversion(amount=0.621371),
 )
 
 STATUS = ObdData(
@@ -272,7 +290,7 @@ THROTTLE_POSITION = ObdData(
     cmd=obd.commands.THROTTLE_POS,
     unit="Percent",
     priority="fast",
-    textToReplace=" percent"
+    textToReplace=" percent",
 )
 
 TIMING_ADVANCE = ObdData(
@@ -280,13 +298,13 @@ TIMING_ADVANCE = ObdData(
     cmd=obd.commands.TIMING_ADVANCE,
     unit="Degrees",
     priority="medium",
-    textToReplace=" degree"
+    textToReplace=" degree",
 )
 # maybe display this on startup
 VERSION = ObdData(
     name="Firmware Version",
     cmd=obd.commands.ELM_VERSION,
-    unit="String", 
+    unit="String",
     priority="slow",
 )
 
@@ -295,7 +313,7 @@ VOLTAGE = ObdData(
     cmd=obd.commands.ELM_VOLTAGE,
     unit="Volts",
     priority="medium",
-    textToReplace=" volt"
+    textToReplace=" volt",
 )
 
 all_data = [

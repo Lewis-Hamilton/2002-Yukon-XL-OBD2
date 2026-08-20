@@ -1,16 +1,16 @@
-import sys
 import os
-import time
 import queue
 import threading
+import time
+
 from args import parser
-from utils import check_connection
+from csv_logger import csv_logger
 from my_data import all_data
 from obd_worker import obd_worker
-from csv_logger import csv_logger
-from render_terminal import render_terminal, data_animation
-from stereo_screen import hide_cursor, show_cursor
+from render_terminal import data_animation, render_terminal
 from startup_screen import startup_screen
+from stereo_screen import hide_cursor, show_cursor
+from utils import check_connection
 
 args = parser.parse_args()
 
@@ -18,13 +18,14 @@ if args.testing or args.manual_testing:
     import fake_obd as obd
 else:
     import obd
-    
-os.system('clear')
+
+os.system("clear")
 hide_cursor()
 
 # Set up connection variables
 connection = None
 connection_error = None
+
 
 def connect_obd():
     global connection, connection_error
@@ -36,6 +37,7 @@ def connect_obd():
         check_connection(connection)
     except Exception as e:
         connection_error = e
+
 
 # Start connecting in background
 connect_thread = threading.Thread(target=connect_obd, daemon=True)
@@ -58,21 +60,20 @@ try:
 
     if args.manual_testing:
         from flask_server import start_flask
+
         start_flask(data_store, data_lock)
 
     # Start OBD Thread
     obd_thread = threading.Thread(
         target=obd_worker,
         args=(connection, all_data, data_store, data_lock, csv_queue),
-        daemon=True
+        daemon=True,
     )
     obd_thread.start()
 
     # Start CSV Thread
     csv_thread = threading.Thread(
-        target=csv_logger,
-        args=(csv_queue, all_data, args),
-        daemon=True
+        target=csv_logger, args=(csv_queue, all_data, args), daemon=True
     )
     csv_thread.start()
 
@@ -89,12 +90,13 @@ except KeyboardInterrupt:
     print("\nStopping...")
 except Exception as e:
     import traceback
+
     traceback.print_exc()
     print(f"Fatal error: {e}")
 finally:
     show_cursor()
     csv_queue.put(None)  # Tell CSV thread to stop
-    time.sleep(0.5)      # Give CSV thread time to finish
+    time.sleep(0.5)  # Give CSV thread time to finish
     if connection:
         try:
             connection.close()
