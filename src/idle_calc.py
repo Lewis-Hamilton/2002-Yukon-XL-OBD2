@@ -1,4 +1,5 @@
 import time
+
 from args import parser
 
 args = parser.parse_args()
@@ -9,6 +10,7 @@ STOP_DELAY = 5
 _stopped_since = 0
 _below_idle_since = None
 _prev_speed = 0
+
 
 def idle_ready(rpm, speed):
     global _stopped_since, _below_idle_since, _prev_speed

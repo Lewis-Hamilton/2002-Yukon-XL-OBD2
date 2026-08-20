@@ -1,10 +1,10 @@
 import obd
+
 from src.utils import check_connection
 
 connection = obd.OBD(portstr="/dev/ttyUSB0")
 
 check_connection(connection)
-
 
 
 print("\nAvailable commands (supported by your car):")

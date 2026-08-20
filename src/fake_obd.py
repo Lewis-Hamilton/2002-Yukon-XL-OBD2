@@ -1,7 +1,7 @@
 # src/fake_obd.py
 
-import time
 import random
+
 
 # --- Mimic obd.OBDCommand ---
 class FakeOBDCommand:
@@ -10,6 +10,7 @@ class FakeOBDCommand:
 
     def __repr__(self):
         return f"<FakeOBDCommand: {self.name}>"
+
 
 # --- Mimic obd.OBDResponse ---
 class FakeOBDResponse:
@@ -22,8 +23,9 @@ class FakeOBDResponse:
 
     def __repr__(self):
         if self._is_null:
-            return f"<FakeOBDResponse: NULL>"
+            return "<FakeOBDResponse: NULL>"
         return self.value
+
 
 # --- Mimic obd.commands ---
 class FakeOBDCommands:
@@ -54,8 +56,10 @@ class FakeOBDCommands:
     TIMING_ADVANCE = FakeOBDCommand("TIMING_ADVANCE")
     ELM_VERSION = FakeOBDCommand("ELM_VERSION")
     ELM_VOLTAGE = FakeOBDCommand("ELM_VOLTAGE")
-    
+
+
 commands = FakeOBDCommands()
+
 
 # --- Mimic obd.OBD (the connection class) ---
 class FakeOBD:
@@ -113,7 +117,10 @@ class FakeOBD:
         elif command.name in ["LONG_FUEL_TRIM_1", "LONG_FUEL_TRIM_2"]:
             return FakeOBDResponse(f"{round(random.uniform(1.0, 20.0), 5)} percent")
         elif command.name == "FUEL_STATUS":
-            statuses = ["('Closed loop, using oxygen sensor feedback to determine fuel mix', 'Closed loop, using oxygen sensor feedback to determine fuel mix')", "('Open loop due to insufficient engine temperature', 'Open loop due to insufficient engine temperature')"]
+            statuses = [
+                "('Closed loop, using oxygen sensor feedback to determine fuel mix', 'Closed loop, using oxygen sensor feedback to determine fuel mix')",
+                "('Open loop due to insufficient engine temperature', 'Open loop due to insufficient engine temperature')",
+            ]
             return FakeOBDResponse(random.choice(statuses))
         elif command.name == "STATUS":
             return FakeOBDResponse("Monitor Status")
@@ -125,18 +132,31 @@ class FakeOBD:
         print(f"FakeOBD: No specific fake data for {command.name}. Returning null.")
         return FakeOBDResponse(None, is_null=True)
 
+
 class FakeOBDStatus:
     CAR_CONNECTED = "CAR_CONNECTED"
     ELM_CONNECTED = "ELM_CONNECTED"
     NOT_CONNECTED = "NOT_CONNECTED"
 
+
 OBDStatus = FakeOBDStatus()
 
+
 class FakeLogger:
-    def info(self, msg): print(f"[FAKE_OBD INFO] {msg}")
-    def warning(self, msg): print(f"[FAKE_OBD WARNING] {msg}")
-    def error(self, msg): print(f"[FAKE_OBD ERROR] {msg}")
-    def debug(self, msg): print(f"[FAKE_OBD DEBUG] {msg}")
-    def setLevel(self, level): pass
+    def info(self, msg):
+        print(f"[FAKE_OBD INFO] {msg}")
+
+    def warning(self, msg):
+        print(f"[FAKE_OBD WARNING] {msg}")
+
+    def error(self, msg):
+        print(f"[FAKE_OBD ERROR] {msg}")
+
+    def debug(self, msg):
+        print(f"[FAKE_OBD DEBUG] {msg}")
+
+    def setLevel(self, level):
+        pass
+
 
 logger = FakeLogger()

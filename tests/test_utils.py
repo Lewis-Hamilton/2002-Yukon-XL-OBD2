@@ -1,5 +1,7 @@
 from unittest.mock import Mock
+
 from src.utils import check_connection
+
 
 def test_check_connection_failed_capsys(capsys):
     mock_connection = Mock()
@@ -13,6 +15,7 @@ def test_check_connection_failed_capsys(capsys):
     assert captured.err == ""
 
     mock_connection.is_connected.assert_called_once()
+
 
 def test_check_connection_success_capsys(capsys):
     mock_connection = Mock()
