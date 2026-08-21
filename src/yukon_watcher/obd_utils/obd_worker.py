@@ -63,7 +63,7 @@ def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
 
             # Write to CSV every 1 second
             if current_time - last_csv_write >= 1.0:
-                data_row = {"Time": datetime.now().time()}
+                data_row = {"Time": datetime.now().astimezone().strftime("%H:%M:%S")}
 
                 with data_lock:
                     for data in all_data:

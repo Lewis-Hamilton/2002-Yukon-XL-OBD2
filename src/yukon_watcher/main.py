@@ -40,7 +40,7 @@ def connect_obd():
         else:
             connection = obd.OBD()
         check_connection(connection)
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001
         connection_error = e
 
 
@@ -109,7 +109,7 @@ def main():
         if connection:
             try:
                 connection.close()
-            except Exception as err:
+            except Exception as err:  # noqa: BLE001
                 # Replaced pass with a descriptive log or warning
                 logger.warning(f"Error while closing OBD connection: {err}")
 
