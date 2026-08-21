@@ -1,3 +1,4 @@
+import logging
 import os
 import queue
 import threading
@@ -28,6 +29,7 @@ hide_cursor()
 # Set up connection variables
 connection = None
 connection_error = None
+logger = logging.getLogger(__name__)
 
 
 def connect_obd():
@@ -92,18 +94,23 @@ def main():
 
     except KeyboardInterrupt:
         print("\nStopping...")
-    except Exception as e:
+
+    except (OSError, RuntimeError) as e:
         import traceback
 
         traceback.print_exc()
         print(f"Fatal error: {e}")
+
     finally:
         show_cursor()
         csv_queue.put(None)  # Tell CSV thread to stop
         time.sleep(0.5)  # Give CSV thread time to finish
+
         if connection:
             try:
                 connection.close()
-            except Exception:
-                pass
+            except Exception as err:
+                # Replaced pass with a descriptive log or warning
+                logger.warning(f"Error while closing OBD connection: {err}")
+
         print("Connection closed. Script finished.")
