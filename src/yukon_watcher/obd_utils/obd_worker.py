@@ -1,9 +1,9 @@
 import time
 from datetime import datetime
 
-from args import parser
-from gear_calc import estimate_gear
-from idle_calc import idle_ready
+from yukon_watcher.args import parser
+from yukon_watcher.calculations.gear_calc import estimate_gear
+from yukon_watcher.calculations.idle_calc import idle_ready
 
 args = parser.parse_args()
 

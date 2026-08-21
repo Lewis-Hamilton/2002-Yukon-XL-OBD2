@@ -1,6 +1,6 @@
 import time
 
-from stereo_screen import print_screen
+from yukon_watcher.display_outputs.stereo_screen import print_screen
 
 BAR_WIDTH = 54
 

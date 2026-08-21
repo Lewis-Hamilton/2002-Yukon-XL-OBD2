@@ -3,19 +3,22 @@ import queue
 import threading
 import time
 
-from args import parser
-from csv_logger import csv_logger
-from my_data import all_data
-from obd_worker import obd_worker
-from render_terminal import data_animation, render_terminal
-from startup_screen import startup_screen
-from stereo_screen import hide_cursor, show_cursor
-from utils import check_connection
+from yukon_watcher.args import parser
+from yukon_watcher.data_outputs.csv_logger import csv_logger
+from yukon_watcher.display_outputs.render_terminal import (
+    data_animation,
+    render_terminal,
+)
+from yukon_watcher.display_outputs.startup_screen import startup_screen
+from yukon_watcher.display_outputs.stereo_screen import hide_cursor, show_cursor
+from yukon_watcher.obd_utils.check_connection import check_connection
+from yukon_watcher.obd_utils.my_data import all_data
+from yukon_watcher.obd_utils.obd_worker import obd_worker
 
 args = parser.parse_args()
 
 if args.testing or args.manual_testing:
-    import fake_obd as obd
+    import yukon_watcher.dev_utils.fake_obd as obd
 else:
     import obd
 

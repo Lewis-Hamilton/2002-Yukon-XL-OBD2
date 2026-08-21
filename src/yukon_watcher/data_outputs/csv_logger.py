@@ -1,8 +1,9 @@
 import csv
 import queue
+import time
 from datetime import datetime
 
-from utils import create_logging_dir, get_filename
+from yukon_watcher.utils import create_logging_dir, get_filename
 
 
 def csv_logger(csv_queue, all_data, args):

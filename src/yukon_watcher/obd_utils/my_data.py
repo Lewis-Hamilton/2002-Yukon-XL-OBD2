@@ -1,12 +1,16 @@
 import random
 
-from args import parser
-from get_pi_data import get_pi_cpu_temp, get_pi_cpu_usage, get_pi_ram_usage
+from yukon_watcher.args import parser
+from yukon_watcher.pi_utils.get_pi_data import (
+    get_pi_cpu_temp,
+    get_pi_cpu_usage,
+    get_pi_ram_usage,
+)
 
 args = parser.parse_args()
 
 if args.testing == True or args.manual_testing == True:
-    import fake_obd as obd
+    import yukon_watcher.dev_utils.fake_obd as obd
 
     connection = obd.FakeOBD()
 
