@@ -1,9 +1,9 @@
 import time
 from datetime import datetime
 
-from args import parser
-from gear_calc import estimate_gear
-from idle_calc import idle_ready
+from yukon_watcher.args import parser
+from yukon_watcher.calculations.gear_calc import estimate_gear
+from yukon_watcher.calculations.idle_calc import idle_ready
 
 args = parser.parse_args()
 
@@ -35,13 +35,14 @@ def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
                 time_since_update = current_time - last_update_times[data.name]
                 interval = priority_intervals.get(data.priority, None)
 
-                if interval is not None and time_since_update >= interval:
-                    if not args.manual_testing:
-                        val = data.response
-
-                        if val is not None:
-                            local_updates[data.name] = val
-                            last_update_times[data.name] = current_time
+                if (
+                    interval is not None
+                    and time_since_update >= interval
+                    and not args.manual_testing
+                    and data.response is not None
+                ):
+                    local_updates[data.name] = data.response
+                    last_update_times[data.name] = current_time
 
             if local_updates:
                 with data_lock:
@@ -63,7 +64,7 @@ def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
 
             # Write to CSV every 1 second
             if current_time - last_csv_write >= 1.0:
-                data_row = {"Time": datetime.now().time()}
+                data_row = {"Time": datetime.now().astimezone().strftime("%H:%M:%S")}
 
                 with data_lock:
                     for data in all_data:
@@ -76,7 +77,11 @@ def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
 
             time.sleep(0.05)  # Small sleep to prevent CPU hammering
 
-        except Exception as e:
-            print(f"OBD Thread Error: {e}")
-            # Clanker says continue or time.sleep(1) would be better, but I don't want to spam
+        except (AttributeError, TypeError, KeyError) as e:
+            # Handle expected data/sensor response formatting errors without exiting loop
+            print(f"OBD Thread Data Error: {e}")
+            time.sleep(1)
+        except Exception as e:  # noqa: BLE001
+            # Fallback catch-all for unknown failures so thread exit is intentional
+            print(f"OBD Thread Fatal Error: {e}")
             break

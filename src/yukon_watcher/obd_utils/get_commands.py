@@ -1,6 +1,6 @@
 import obd
 
-from src.utils import check_connection
+from yukon_watcher.obd_utils.check_connection import check_connection
 
 connection = obd.OBD(portstr="/dev/ttyUSB0")
 

@@ -1,6 +1,6 @@
 import time
 
-from stereo_screen import INNER_HEIGHT, print_screen
+from yukon_watcher.display_outputs.stereo_screen import INNER_HEIGHT, print_screen
 
 DELAY = 0.9
 

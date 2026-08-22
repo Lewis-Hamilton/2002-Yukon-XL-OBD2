@@ -1,6 +1,6 @@
 import time
 
-from args import parser
+from yukon_watcher.args import parser
 
 args = parser.parse_args()
 

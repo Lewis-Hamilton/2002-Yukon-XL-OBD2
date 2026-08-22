@@ -1,16 +1,6 @@
 import os
 
 
-def check_connection(connection):
-    if not connection.is_connected():
-        print(
-            "Failed to connect to the OBD-II adapter. Make sure it's plugged in and your car's ignition is on."
-        )
-        raise ConnectionError("OBD-II connection failed")
-    else:
-        return
-
-
 def get_filename(filename):
     """
     Checks if a file exists and returns a unique name by adding a number.
@@ -32,23 +22,6 @@ def get_filename(filename):
         counter += 1
 
     return new_filename
-
-
-def celsius_to_fahrenheit(celsius):
-    fahrenheit = (celsius * 9 / 5) + 32
-    return fahrenheit
-
-
-def convert_to_number(dirty_string):
-    my_string = dirty_string
-    cleaned_string = my_string.replace(" Celsius", "")
-    cleaned_string = cleaned_string.strip()
-    try:
-        numeric_value = float(cleaned_string)
-        return numeric_value
-    except ValueError:
-        print(f"Error: Could not convert '{cleaned_string}' to a number.")
-        return None
 
 
 def create_logging_dir():
