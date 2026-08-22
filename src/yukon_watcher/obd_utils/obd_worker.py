@@ -35,13 +35,14 @@ def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
                 time_since_update = current_time - last_update_times[data.name]
                 interval = priority_intervals.get(data.priority, None)
 
-                if interval is not None and time_since_update >= interval:
-                    if not args.manual_testing:
-                        val = data.response
-
-                        if val is not None:
-                            local_updates[data.name] = val
-                            last_update_times[data.name] = current_time
+                if (
+                    interval is not None
+                    and time_since_update >= interval
+                    and not args.manual_testing
+                    and data.response is not None
+                ):
+                    local_updates[data.name] = data.response
+                    last_update_times[data.name] = current_time
 
             if local_updates:
                 with data_lock:
@@ -76,7 +77,11 @@ def obd_worker(connection, all_data, data_store, data_lock, csv_queue):
 
             time.sleep(0.05)  # Small sleep to prevent CPU hammering
 
-        except Exception as e:
-            print(f"OBD Thread Error: {e}")
-            # Clanker says continue or time.sleep(1) would be better, but I don't want to spam
+        except (AttributeError, TypeError, KeyError) as e:
+            # Handle expected data/sensor response formatting errors without exiting loop
+            print(f"OBD Thread Data Error: {e}")
+            time.sleep(1)
+        except Exception as e:  # noqa: BLE001
+            # Fallback catch-all for unknown failures so thread exit is intentional
+            print(f"OBD Thread Fatal Error: {e}")
             break
