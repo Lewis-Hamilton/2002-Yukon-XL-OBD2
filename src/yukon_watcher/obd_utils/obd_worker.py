@@ -74,7 +74,10 @@ def _update_calculated_fields(local_updates, data_store):
 
 
 def _build_csv_row(all_data, data_store):
-    row = {"Time": datetime.now().astimezone().strftime("%H:%M:%S")}
+    row = {
+        "Time": datetime.now().astimezone().strftime("%H:%M:%S"),
+        "OBD Connected": obd_state.is_connected,
+    }
     for data in all_data:
         row[f"{data.name} ({data.unit})"] = data_store.get(data.name, 0)
     return row
