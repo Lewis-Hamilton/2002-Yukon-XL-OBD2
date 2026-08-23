@@ -6,6 +6,7 @@ from yukon_watcher.display_outputs.startup_screen import startup_screen
 from yukon_watcher.display_outputs.stereo_screen import hide_cursor, show_cursor
 from yukon_watcher.obd_utils.connection import OBDConnector
 from yukon_watcher.obd_utils.obd_module import obd
+from yukon_watcher.pi_utils.my_gpio import HardwareManager
 from yukon_watcher.runtime import run
 
 args = parser.parse_args()
@@ -17,10 +18,9 @@ def _handle_sigterm(signum, frame):
     terminates on immediately by default -- no `finally` blocks run, no
     cleanup happens. Converting it into a KeyboardInterrupt routes it
     through the same graceful-shutdown path as Ctrl+C, so run()'s
-    `finally` (CSV flush, OBD close, cursor) still runs
-    before the process actually exits -- which matters here since the
-    shutdown button's `poweroff` call waits for `systemctl stop` to
-    finish first.
+    `finally` (CSV flush, OBD close, cursor) still runs -- and the
+    process exits normally, which is what lets gpiozero's own atexit
+    handler release the GPIO pins.
     """
     raise KeyboardInterrupt
 
@@ -29,6 +29,13 @@ def main():
     os.system("clear")
     hide_cursor()
     signal.signal(signal.SIGTERM, _handle_sigterm)
+
+    # Registers the auto-start/power-off buttons and binds the
+    # shutdown callback. Must be created for the physical buttons to
+    # do anything at all -- gpiozero's Button listener threads only
+    # exist once this is instantiated. Kept alive for the program's
+    # whole run just by being in this frame; never referenced again.
+    _hardware_manager = HardwareManager()
 
     # Starts connecting in the background and keeps retrying/monitoring
     # for the rest of the run -- we never wait on it.

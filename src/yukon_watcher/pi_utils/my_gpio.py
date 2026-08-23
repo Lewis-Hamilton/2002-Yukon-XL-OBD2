@@ -30,7 +30,7 @@ class HardwareManager:
         time.sleep(3)
 
         # Stop systemd service first so it won't auto-restart
-        subprocess.run(["sudo", "systemctl", "stop", "yukon.service"])
+        subprocess.run(["sudo", "systemctl", "stop", "yukon.service"], check=False)
 
         # Execute system shutdown command
-        subprocess.run(["sudo", "/sbin/poweroff"])
+        subprocess.run(["sudo", "/sbin/poweroff"], check=False)
