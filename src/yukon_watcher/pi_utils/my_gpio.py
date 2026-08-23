@@ -22,23 +22,23 @@ class HardwareManager:
     def is_auto_start_pressed(self) -> bool:
         return self.auto_start_button.is_pressed
 
-    def _power_off_callback(self) -> None:
-        """Runs in the background when the POWER_OFF button is pressed."""
-        # would be cool if this played the animation on the display in reverse
-        print("\n==================================================")
-        print(" SHUTDOWN BUTTON PRESSED! ")
-        print(" Stopping telemetry and powering down in 3s...")
-        print(" Goodbye ")
-        print("==================================================\n")
 
-        time.sleep(3)
+def _power_off_callback(self) -> None:
+    """Runs in the background when the POWER_OFF button is pressed."""
+    # would be cool if this played the animation on the display in reverse
+    print("\n==================================================")
+    print(" SHUTDOWN BUTTON PRESSED! ")
+    print(" Stopping telemetry and powering down in 3s...")
+    print(" Goodbye ")
+    print("==================================================\n")
 
-        # 1. Spawn poweroff in a detached background subprocess so it executes
-        # regardless of this Python process being terminated.
-        subprocess.Popen(["sudo", "/sbin/poweroff"])
+    time.sleep(3)
 
-        # 2. Stop systemd service to prevent auto-restart race conditions
-        subprocess.run(["sudo", "systemctl", "stop", "yukon.service"], check=False)
+    # 1. Trigger non-blocking system shutdown
+    subprocess.Popen(["sudo", "/usr/bin/systemctl", "poweroff"])
 
-        # 3. Now signal SIGTERM so main.py runs its graceful cleanup/CSV flush
-        os.kill(os.getpid(), signal.SIGTERM)
+    # 2. Stop systemd service to prevent auto-restart
+    subprocess.run(["sudo", "/usr/bin/systemctl", "stop", "yukon.service"], check=False)
+
+    # 3. Gracefully terminate Python process & trigger CSV flush
+    os.kill(os.getpid(), signal.SIGTERM)
