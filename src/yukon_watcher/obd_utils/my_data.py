@@ -1,6 +1,8 @@
 import random
 
 from yukon_watcher.args import parser
+from yukon_watcher.obd_utils import obd_state
+from yukon_watcher.obd_utils.obd_module import obd
 from yukon_watcher.pi_utils.get_pi_data import (
     get_pi_cpu_temp,
     get_pi_cpu_usage,
@@ -8,16 +10,6 @@ from yukon_watcher.pi_utils.get_pi_data import (
 )
 
 args = parser.parse_args()
-
-if args.testing == True or args.manual_testing == True:
-    import yukon_watcher.dev_utils.fake_obd as obd
-
-    connection = obd.FakeOBD()
-
-else:
-    import obd
-
-    connection = obd.OBD(portstr="/dev/ttyUSB0")
 
 
 class AddedData:
@@ -33,9 +25,6 @@ class AddedData:
         if args.testing and self.testing_func:
             return self.testing_func()
         return self.real_func() if self.real_func else None
-
-
-ESTIMATED_GEAR = AddedData(name="Estimated Gear", unit="")
 
 
 class Conversion:
@@ -63,21 +52,43 @@ class ObdData:
 
     @property
     def response(self):
-        myresponse = connection.query(self.cmd)
-        if self.textToReplace is not None:
+        """Returns None whenever a live value isn't available: no OBD
+        connection, a malformed/empty reading, or a query error.
+        Callers (obd_worker) treat None as "leave the default value in
+        place" rather than as an error.
+
+        This does NOT try to detect a dropped connection itself -- a
+        single failed/unsupported PID (e.g. "NO DATA" from an O2 sensor
+        with the engine off) doesn't mean the car is gone. It just
+        records successes; OBDConnector's staleness watchdog is what
+        decides the car has gone quiet, based on how long it's been
+        since ANY PID last actually succeeded.
+        """
+        if not obd_state.is_connected:
+            return None
+
+        try:
+            myresponse = obd_state.connection.query(self.cmd)
+            if hasattr(myresponse, "is_null") and myresponse.is_null():
+                return None
+
+            if self.textToReplace is None:
+                obd_state.record_success()
+                return myresponse
+
             stringResponse = str(myresponse)
             cleanedResponse = stringResponse.replace(self.textToReplace, "")
             unConvertedResponse = float(cleanedResponse)
+            obd_state.record_success()
             if self.conversion is not None:
                 convertedResponse = (
                     unConvertedResponse * self.conversion.amount
                     + self.conversion.offset
                 )
                 return round(convertedResponse)
-            else:
-                return round(unConvertedResponse)
-        else:
-            return myresponse
+            return round(unConvertedResponse)
+        except Exception:  # noqa: BLE001
+            return None
 
 
 AUX_INPUT_STATUS = ObdData(

@@ -12,19 +12,20 @@ from yukon_watcher.obd_utils.my_data import all_data
 from yukon_watcher.obd_utils.obd_worker import obd_worker
 
 RENDER_INTERVAL = 0.1  # How fast to draw the output
-STARTUP_SETTLE_TIME = 2  # Give OBD thread time to get first readings
+STARTUP_SETTLE_TIME = 2  # Give worker thread time to get first readings
 CSV_SHUTDOWN_GRACE = 0.5  # Give CSV thread time to finish
 
 
-def _start_worker_threads(connection, data_store, data_lock, args):
-    """Starts the OBD-polling and CSV-logging threads and returns the
-    csv_queue so the caller can signal shutdown later.
+def _start_worker_threads(data_store, data_lock, args):
+    """Starts the sensor-polling and CSV-logging threads and returns the
+    csv_queue so the caller can signal shutdown later. Runs the same
+    whether or not OBD is connected -- see obd_worker/my_data.
     """
     csv_queue = queue.Queue()
 
     obd_thread = threading.Thread(
         target=obd_worker,
-        args=(connection, all_data, data_store, data_lock, csv_queue),
+        args=(all_data, data_store, data_lock, csv_queue),
         daemon=True,
     )
     obd_thread.start()
@@ -54,11 +55,14 @@ def _render_loop(data_store, data_lock):
 
 
 def run(connector, args):
-    """Runs the app once a live OBD connection is established: starts
-    background threads, plays the intro animation, then loops rendering
-    the terminal display until interrupted.
+    """Runs the app: starts background threads, plays the intro
+    animation, then loops rendering the terminal display until
+    interrupted.
 
-    `connector` is an OBDConnector that has already connected successfully.
+    Works whether or not `connector` ended up with a live OBD
+    connection -- OBD gauges just hold their default values (see
+    my_data.ObdData.response) until/unless one is available. Pi data
+    and CSV logging run unconditionally.
     """
     data_lock = threading.Lock()
     data_store = {data.name: 0 for data in all_data}
@@ -66,9 +70,7 @@ def run(connector, args):
 
     try:
         _maybe_start_flask(args, data_store, data_lock)
-        csv_queue = _start_worker_threads(
-            connector.connection, data_store, data_lock, args
-        )
+        csv_queue = _start_worker_threads(data_store, data_lock, args)
 
         time.sleep(STARTUP_SETTLE_TIME)
         data_animation()
@@ -91,4 +93,4 @@ def run(connector, args):
             time.sleep(CSV_SHUTDOWN_GRACE)
 
         connector.close()
-        print("Connection closed. Script finished.")
+        print("Script finished.")

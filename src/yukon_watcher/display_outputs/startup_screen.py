@@ -5,7 +5,11 @@ from yukon_watcher.display_outputs.stereo_screen import INNER_HEIGHT, print_scre
 DELAY = 0.9
 
 
-def startup_screen(connect_thread):
+def startup_screen():
+    """Plays the G-M-C reveal animation, then returns. Purely
+    decorative -- it no longer waits on an OBD connection. The app
+    starts rendering data right after this, with or without OBD.
+    """
     # Perfectly symmetrical 15-character wide G
     G = [
         "███████████████",
@@ -75,7 +79,6 @@ def startup_screen(connect_thread):
     print_screen(make_frame(G, M, blank))
     time.sleep(DELAY)
 
-    # Show G + M + C and wait for connection
+    # Show G + M + C
     print_screen(make_frame(G, M, C))
-    while connect_thread.is_alive():
-        time.sleep(0.5)
+    time.sleep(DELAY)
