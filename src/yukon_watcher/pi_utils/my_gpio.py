@@ -1,7 +1,10 @@
-import time
 import subprocess
+import time
+
 from gpiozero import Button
+
 from yukon_watcher.constants.pi_pins import PiPins
+
 
 class HardwareManager:
     def __init__(self):
