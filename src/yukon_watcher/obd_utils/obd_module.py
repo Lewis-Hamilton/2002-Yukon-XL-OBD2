@@ -12,6 +12,7 @@ fixed-layout redraw.
 """
 
 import logging
+import os
 
 from yukon_watcher.args import parser
 
@@ -19,6 +20,7 @@ args = parser.parse_args()
 
 if args.testing or args.manual_testing:
     import yukon_watcher.dev_utils.fake_obd as obd
+    os.environ["GPIOZERO_PIN_FACTORY"] = "mock"
 else:
     import obd
 

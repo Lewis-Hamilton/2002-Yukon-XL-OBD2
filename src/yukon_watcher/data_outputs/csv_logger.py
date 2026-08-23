@@ -27,6 +27,7 @@ def csv_logger(csv_queue, all_data, args):
 
     csv_name = get_filename(initial_csv_name)
     column_names = [f"{data.name} ({data.unit})" for data in all_data]
+    column_names.insert(0, "OBD Connected")
     column_names.insert(0, "Time")
 
     with open(csv_name, "w", newline="", encoding="utf-8") as csvfile:
