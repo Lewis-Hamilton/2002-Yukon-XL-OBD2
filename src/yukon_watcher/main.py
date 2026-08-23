@@ -6,6 +6,7 @@ from yukon_watcher.display_outputs.stereo_screen import hide_cursor
 from yukon_watcher.obd_utils.connection import OBDConnector
 from yukon_watcher.obd_utils.obd_module import obd
 from yukon_watcher.runtime import run
+from yukon.pi_utils.my_gpio import HardwareManager
 
 args = parser.parse_args()
 
