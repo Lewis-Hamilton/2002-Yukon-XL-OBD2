@@ -1,9 +1,13 @@
+import os
+import signal
 import subprocess
 import time
 
 from gpiozero import Button
 
 from yukon_watcher.constants.pi_pins import PiPins
+
+SHUTDOWN_GRACE = 2  # Give the graceful exit time to actually finish
 
 
 class HardwareManager:
@@ -29,7 +33,15 @@ class HardwareManager:
 
         time.sleep(3)
 
-        # Stop systemd service first so it won't auto-restart
+        # Signal THIS process directly -- not just via systemctl, which
+        # only stops the actual yukon.service unit and has no effect if
+        # we were launched manually (e.g. `python3 -m yukon_watcher`).
+        # main.py converts SIGTERM into the same graceful-exit path as
+        # Ctrl+C, so this runs regardless of how the script was started.
+        os.kill(os.getpid(), signal.SIGTERM)
+        time.sleep(SHUTDOWN_GRACE)  # let CSV flush / OBD close actually finish
+
+        # Also stop the systemd service, in case it's set to auto-restart
         subprocess.run(["sudo", "systemctl", "stop", "yukon.service"], check=False)
 
         # Execute system shutdown command
