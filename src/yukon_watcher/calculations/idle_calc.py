@@ -31,7 +31,11 @@ def idle_ready(rpm, speed):
         # waiting to slow down, don't check idle
         return True
 
-    if rpm < args.idle_rpm:
+    # rpm must be above zero to count toward idle at all -- rpm == 0
+    # means the engine is off (or between cranks), not idling. Without
+    # this, a fully-off engine sitting still would read as "idle ready"
+    # after IDLE_DELAY seconds, since 0 also satisfies "< idle_rpm".
+    if 0 < rpm < args.idle_rpm:
         if _below_idle_since is None:
             _below_idle_since = time.time()
         return (time.time() - _below_idle_since) >= IDLE_DELAY

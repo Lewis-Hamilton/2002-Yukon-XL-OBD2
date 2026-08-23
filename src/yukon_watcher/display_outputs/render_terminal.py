@@ -1,8 +1,10 @@
 import time
 
 from yukon_watcher.display_outputs.stereo_screen import print_screen
+from yukon_watcher.obd_utils import obd_state
 
 BAR_WIDTH = 54
+CONNECTION_BAR_WIDTH = 12  # Small and deliberate -- not a full-width gauge
 
 
 def loading_bar():
@@ -21,57 +23,22 @@ def loading_bar():
 
 
 def idle_indicator(idle_status):
+    if idle_status is None:
+        # No OBD data to base this on -- blank, not "not idle"
+        return "\u2591" * BAR_WIDTH
     if idle_status:
         return "\u2588" * BAR_WIDTH
-    else:
-        return loading_bar()
+    return loading_bar()
 
 
-def gear_indicator(gear, bar_width):
-    gears = ["NONE", "1st", "2nd", "3rd", "4th"]
-    gear_map = {
-        "1st": 1,
-        "2nd": 2,
-        "3rd": 3,
-        "4th (OD)": 4,
-        "N/P": 0,
-        "---": 0,
-    }
-
-    active = gear_map.get(gear, 0)
-
-    # Account for opening |, 4 inner dividers, closing |
-    total = bar_width - 6
-    base = total // 4
-
-    # Make sure base - len(gear_label) is always even
-    # '1st', '2nd', '3rd', '4th' are all 3 chars
-    # so base - 3 must be even, meaning base must be odd
-    if (base - 3) % 2 != 0:
-        base -= 1
-
-    na_width = total - (base * 4)  # N/A gets whatever is left
-
-    widths = [na_width, base, base, base, base]
-
-    header = "┃"
-    fill = "┃"
-
-    for i, (g, w) in enumerate(zip(gears, widths)):
-        dashes = w - len(g)
-        left = dashes // 2
-        right = dashes // 2
-        header += "━" * left + g + "━" * right
-
-        if i == active:
-            fill += "\u2588" * w
-        else:
-            fill += " " * w
-
-        header += "┃"
-        fill += "┃"
-
-    return header, fill
+def connection_indicator(is_connected):
+    """Solid when OBD is connected, empty when it isn't. No text, no
+    error messages -- just a steady status bar that can't corrupt the
+    fixed gauge layout the way a stray print() would.
+    """
+    if is_connected:
+        return "\u2588" * CONNECTION_BAR_WIDTH
+    return "\u2591" * CONNECTION_BAR_WIDTH
 
 
 def progress_bar(bar_data):
@@ -87,12 +54,10 @@ def render_terminal(data_store):
 
     throttle = data_store.get("Throttle Position", 0)
     load = data_store.get("Engine Load", 0)
-    gear = data_store.get("Estimated Gear", "---")
     idle_status = data_store.get("Idle Indicator")
     pi_cpu_temp = data_store.get("PI CPU Temperature")
     pi_cpu_usage = data_store.get("PI CPU Usage")
     pi_ram_usage = data_store.get("PI RAM Usage")
-    gear_header, gear_fill = gear_indicator(gear, BAR_WIDTH)
     idle_bar = idle_indicator(idle_status)
 
     # Pi temp status
@@ -107,8 +72,8 @@ def render_terminal(data_store):
     lines.append("Idle Status")
     lines.append(idle_bar)
     lines.append(divider)
-    lines.append(gear_header)
-    lines.append(gear_fill)
+    lines.append("OBD CONNECTION")
+    lines.append(connection_indicator(obd_state.is_connected))
     lines.append(divider)
     lines.append(f"LOAD: {load}%")
     lines.append(progress_bar(load))
@@ -126,28 +91,18 @@ def render_terminal(data_store):
 
 
 def data_animation():
-    """Sweep all bars from 0 to 100 and back, cycle through gears"""
-    gears = ["N/P", "1st", "2nd", "3rd", "4th (OD)", "3rd", "2nd", "1st", "N/P"]
+    """Sweep all bars from 0 to 100 and back"""
     steps = list(range(0, 101, 5)) + list(range(100, -1, -5))
 
-    for i, value in enumerate(steps):
+    for value in steps:
         fake_store = {
-            "Engine Load": 0,
-            "Throttle Position": 0,
-            "PI CPU Temperature": 0,
-            "PI CPU Usage": 0,
-            "PI RAM Usage": 0,
-            "Estimated Gear": "N/P",
+            "Engine Load": value,
+            "Throttle Position": value,
+            "PI CPU Temperature": value,
+            "PI CPU Usage": value,
+            "PI RAM Usage": value,
+            "Idle Indicator": False,  # Demo state -- drives the loading-bar sweep
         }
-        fake_store["Engine Load"] = value
-        fake_store["Throttle Position"] = value
-        fake_store["PI CPU Temperature"] = value
-        fake_store["PI CPU Usage"] = value
-        fake_store["PI RAM Usage"] = value
-
-        # Cycle through gears based on progress
-        gear_index = int((i / len(steps)) * len(gears))
-        fake_store["Estimated Gear"] = gears[min(gear_index, len(gears) - 1)]
 
         render_terminal(fake_store)
         time.sleep(0.07)

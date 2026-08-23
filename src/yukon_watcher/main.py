@@ -4,27 +4,29 @@ from yukon_watcher.args import parser
 from yukon_watcher.display_outputs.startup_screen import startup_screen
 from yukon_watcher.display_outputs.stereo_screen import hide_cursor
 from yukon_watcher.obd_utils.connection import OBDConnector
+from yukon_watcher.obd_utils.obd_module import obd
 from yukon_watcher.runtime import run
 
 args = parser.parse_args()
-
-if args.testing or args.manual_testing:
-    import yukon_watcher.dev_utils.fake_obd as obd
-else:
-    import obd
 
 
 def main():
     os.system("clear")
     hide_cursor()
 
+    # Starts connecting in the background and keeps retrying/monitoring
+    # for the rest of the run -- we never wait on it.
     connector = OBDConnector(obd, use_fake=args.testing or args.manual_testing)
-    connect_thread = connector.start()
+    connector.start()
 
-    # Play animation while connection happens in the background
-    startup_screen(connect_thread)
-    connector.raise_if_failed()
+    startup_screen()  # Just the intro animation, not gated on OBD
 
+    # Runs immediately either way: OBD gauges hold default values until
+    # (re)connected; Pi data and CSV logging always run. If OBD connects
+    # or drops out mid-run, my_data/obd_worker/connection pick it up on
+    # their own, and the connection bar in render_terminal reflects it --
+    # no status print here, since that could interleave with the
+    # terminal's fixed-layout redraw.
     run(connector, args)
 
 
