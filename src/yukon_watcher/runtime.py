@@ -93,4 +93,5 @@ def run(connector, args):
             time.sleep(CSV_SHUTDOWN_GRACE)
 
         connector.close()
+        reset_gpio()
         print("Script finished.")

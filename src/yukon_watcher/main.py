@@ -13,6 +13,7 @@ args = parser.parse_args()
 def main():
     os.system("clear")
     hide_cursor()
+    hardware_manager = HardwareManager()
 
     # Starts connecting in the background and keeps retrying/monitoring
     # for the rest of the run -- we never wait on it.

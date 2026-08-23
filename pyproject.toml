@@ -9,6 +9,7 @@ dependencies = [
     "obd",
     "psutil",
     "flask",
+    "gpiozero",
 ]
 
 [tool.setuptools.packages.find]
