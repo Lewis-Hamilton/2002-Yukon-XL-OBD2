@@ -33,16 +33,12 @@ class HardwareManager:
 
         time.sleep(3)
 
-        # Signal THIS process directly -- not just via systemctl, which
-        # only stops the actual yukon.service unit and has no effect if
-        # we were launched manually (e.g. `python3 -m yukon_watcher`).
-        # main.py converts SIGTERM into the same graceful-exit path as
-        # Ctrl+C, so this runs regardless of how the script was started.
-        os.kill(os.getpid(), signal.SIGTERM)
-        time.sleep(SHUTDOWN_GRACE)  # let CSV flush / OBD close actually finish
+        # 1. Spawn poweroff in a detached background subprocess so it executes
+        # regardless of this Python process being terminated.
+        subprocess.Popen(["sudo", "/sbin/poweroff"])
 
-        # Also stop the systemd service, in case it's set to auto-restart
+        # 2. Stop systemd service to prevent auto-restart race conditions
         subprocess.run(["sudo", "systemctl", "stop", "yukon.service"], check=False)
 
-        # Execute system shutdown command
-        subprocess.run(["sudo", "/sbin/poweroff"], check=False)
+        # 3. Now signal SIGTERM so main.py runs its graceful cleanup/CSV flush
+        os.kill(os.getpid(), signal.SIGTERM)
