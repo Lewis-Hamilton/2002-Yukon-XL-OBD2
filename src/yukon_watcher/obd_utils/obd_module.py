@@ -12,6 +12,7 @@ fixed-layout redraw.
 """
 
 import logging
+import os
 
 from yukon_watcher.args import parser
 
