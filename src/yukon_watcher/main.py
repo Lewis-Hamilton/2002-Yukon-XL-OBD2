@@ -2,6 +2,7 @@ import os
 import signal
 
 from yukon_watcher.args import parser
+from yukon_watcher.dev_utils.start_check import start_check
 from yukon_watcher.display_outputs.startup_screen import startup_screen
 from yukon_watcher.display_outputs.stereo_screen import hide_cursor, show_cursor
 from yukon_watcher.obd_utils.connection import OBDConnector
@@ -27,7 +28,6 @@ def _handle_sigterm(signum, frame):
 
 def main():
     os.system("clear")
-    hide_cursor()
     signal.signal(signal.SIGTERM, _handle_sigterm)
 
     # Registers the auto-start/power-off buttons and binds the
@@ -37,10 +37,9 @@ def main():
     # whole run just by being in this frame; never referenced again.
     _hardware_manager = HardwareManager()
 
-    if _hardware_manager.is_auto_start_pressed():
-        print("Auto-start switch is active. Auto-start disabled. Exiting.")
-        show_cursor()
-        return
+    start_check(_hardware_manager.is_auto_start_pressed)
+
+    hide_cursor()
 
     # Starts connecting in the background and keeps retrying/monitoring
     # for the rest of the run -- we never wait on it.
