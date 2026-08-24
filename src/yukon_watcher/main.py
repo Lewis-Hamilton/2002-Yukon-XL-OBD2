@@ -37,6 +37,11 @@ def main():
     # whole run just by being in this frame; never referenced again.
     _hardware_manager = HardwareManager()
 
+    if _hardware_manager.is_auto_start_pressed():
+        print("Auto-start switch is active. Auto-start disabled. Exiting.")
+        show_cursor()
+        return
+
     # Starts connecting in the background and keeps retrying/monitoring
     # for the rest of the run -- we never wait on it.
     connector = OBDConnector(obd, use_fake=args.testing or args.manual_testing)
