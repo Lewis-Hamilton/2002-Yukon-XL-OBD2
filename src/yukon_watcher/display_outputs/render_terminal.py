@@ -10,7 +10,7 @@ IDLE_BAR_WIDTH = BAR_WIDTH - CONNECTION_BAR_WIDTH - SPACING  # 38
 
 
 def loading_bar(width):
-    BLOCK_WIDTH = min(20, width)
+    BLOCK_WIDTH = min(15, width)
     BAR_SPEED = 30
     travel = width - BLOCK_WIDTH
     period = travel * 2
@@ -38,10 +38,20 @@ def connection_indicator(is_connected, width):
     return "\u2591" * width
 
 
-def progress_bar(bar_data):
-    if bar_data is None:
+def progress_bar(val, min_val=0, max_val=100):
+    """
+    Renders a gauge bar scaled to any custom [min_val, max_val] range.
+    """
+    if val is None:
         return "\u2591" * BAR_WIDTH
-    bar_fill = int((min(bar_data, 100) / 100) * BAR_WIDTH)
+
+    # Clamp value within [min_val, max_val] bounds
+    clamped_val = max(min_val, min(val, max_val))
+
+    # Calculate zero-to-one ratio across the custom scale
+    pct = (clamped_val - min_val) / (max_val - min_val)
+
+    bar_fill = int(pct * BAR_WIDTH)
     bar = "\u2588" * bar_fill + "\u2591" * (BAR_WIDTH - bar_fill)
     return bar
 
@@ -70,6 +80,12 @@ def render_terminal(data_store):
     else:
         pi_str = f"{pi_cpu_temp}C"
 
+    # DS18B20 Temp string formatting
+    if driver_side_engine_bay_temperature is None:
+        ds18_str = "--F"
+    else:
+        ds18_str = f"{driver_side_engine_bay_temperature:.1f}F"
+
     divider = "━" * BAR_WIDTH
 
     lines = []
@@ -79,8 +95,14 @@ def render_terminal(data_store):
     )
     lines.append(f"{conn_bar}{' ' * SPACING}{idle_bar}")
     lines.append(divider)
-    lines.append("Driver Side Engine Temperature")
-    lines.append(progress_bar(driver_side_engine_bay_temperature))
+    lines.append(f"Driver Side Engine Temperature: {ds18_str}")
+
+    # Pass sensor min (-67F) and max (257F) to scale the bar accurately
+    # (Or use custom operational limits like min_val=0, max_val=200 for better visual range)
+    lines.append(
+        progress_bar(driver_side_engine_bay_temperature, min_val=-67, max_val=257)
+    )
+
     lines.append(f"LOAD: {load}%")
     lines.append(progress_bar(load))
     lines.append(f"THROTTLE: {throttle}%")
@@ -102,6 +124,7 @@ def data_animation():
 
     for value in steps:
         fake_store = {
+            "Driver Side Engine Bay Temperature": value,
             "Engine Load": value,
             "Throttle Position": value,
             "PI CPU Temperature": value,
