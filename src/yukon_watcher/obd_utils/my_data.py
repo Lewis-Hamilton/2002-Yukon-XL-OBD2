@@ -1,6 +1,7 @@
 import random
 
 from yukon_watcher.args import parser
+from yukon_watcher.constants.sensor_ids import SensorIds
 from yukon_watcher.obd_utils import obd_state
 from yukon_watcher.obd_utils.obd_module import obd
 from yukon_watcher.pi_utils.get_pi_data import (
@@ -8,6 +9,7 @@ from yukon_watcher.pi_utils.get_pi_data import (
     get_pi_cpu_usage,
     get_pi_ram_usage,
 )
+from yukon_watcher.pi_utils.get_temperature_data import get_ds18b20_temp_c
 
 args = parser.parse_args()
 
@@ -104,6 +106,13 @@ COOLANT_TEMP = ObdData(
     unit="Fahrenheit",
     priority="medium",
     textToReplace=" degree_Celsius",
+    conversion=Conversion(amount=1.8, offset=32),
+)
+
+DRIVER_SIDE_ENGINE_BAY_TEMP = AddedData(
+    name="Driver Side Engine Bay Temperature",
+    unit="Fahrenheit",
+    real_func=lambda: get_ds18b20_temp_c(SensorIds.driver_side_engine_bay_temperature),
     conversion=Conversion(amount=1.8, offset=32),
 )
 
