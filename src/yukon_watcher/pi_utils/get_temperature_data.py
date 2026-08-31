@@ -1,6 +1,6 @@
-def get_ds18b20_temp_c(sensor_id: str) -> float | None:
+def get_ds18b20_temp_f(sensor_id: str) -> float | None:
     """
-    Reads raw Celsius float from a DS18B20 sensor sysfs path.
+    Reads raw temperature from a DS18B20 sensor sysfs path and converts to Fahrenheit.
     Returns None if reading fails or CRC check fails.
     """
     sensor_path = f"/sys/bus/w1/devices/{sensor_id}/w1_slave"
@@ -16,7 +16,8 @@ def get_ds18b20_temp_c(sensor_id: str) -> float | None:
         equals_pos = lines[1].find("t=")
         if equals_pos != -1:
             temp_string = lines[1][equals_pos + 2 :].strip()
-            return float(temp_string) / 1000.0
+            temp_c = float(temp_string) / 1000.0
+            return temp_c * 1.8 + 32.0
     except (FileNotFoundError, IndexError, ValueError):
         return None
 
