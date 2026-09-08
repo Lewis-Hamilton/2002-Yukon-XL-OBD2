@@ -137,6 +137,7 @@ def data_animation():
     for value in steps:
         fake_store = {
             "Driver Side Engine Bay Temperature": value,
+            "Passenger Side Engine Bay Temperature": value,
             "Engine Load": value,
             "Throttle Position": value,
             "PI CPU Temperature": value,
