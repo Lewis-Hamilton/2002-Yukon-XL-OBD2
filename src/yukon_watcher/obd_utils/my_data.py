@@ -115,6 +115,14 @@ DRIVER_SIDE_ENGINE_BAY_TEMP = AddedData(
     real_func=lambda: get_ds18b20_temp_f(SensorIds.driver_side_engine_bay_temperature),
 )
 
+PASSENGER_SIDE_ENGINE_BAY_TEMP = AddedData(
+    name="Passenger Side Engine Bay Temperature",
+    unit="Fahrenheit",
+    real_func=lambda: get_ds18b20_temp_f(
+        SensorIds.passenger_side_engine_bay_temperature
+    ),
+)
+
 ENGINE_LOAD = ObdData(
     name="Engine Load",
     cmd=obd.commands.ENGINE_LOAD,

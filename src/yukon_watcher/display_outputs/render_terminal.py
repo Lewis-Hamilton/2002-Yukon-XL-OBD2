@@ -70,6 +70,9 @@ def render_terminal(data_store):
     driver_side_engine_bay_temperature = data_store.get(
         "Driver Side Engine Bay Temperature"
     )
+    passenger_side_engine_bay_temperature = data_store.get(
+        "Passenger Side Engine Bay Temperature"
+    )
 
     idle_bar = idle_indicator(idle_status, IDLE_BAR_WIDTH)
     conn_bar = connection_indicator(obd_state.is_connected, CONNECTION_BAR_WIDTH)
@@ -82,9 +85,14 @@ def render_terminal(data_store):
 
     # DS18B20 Temp string formatting
     if driver_side_engine_bay_temperature is None:
-        ds18_str = "--F"
+        driver_ds18_str = "--F"
     else:
-        ds18_str = f"{driver_side_engine_bay_temperature:.1f}F"
+        driver_ds18_str = f"{driver_side_engine_bay_temperature:.1f}F"
+
+    if passenger_side_engine_bay_temperature is None:
+        passenger_ds18_str = "--F"
+    else:
+        passenger_ds18_str = f"{passenger_side_engine_bay_temperature:.1f}F"
 
     divider = "━" * BAR_WIDTH
 
@@ -95,12 +103,16 @@ def render_terminal(data_store):
     )
     lines.append(f"{conn_bar}{' ' * SPACING}{idle_bar}")
     lines.append(divider)
-    lines.append(f"Driver Side Engine Temperature: {ds18_str}")
+    lines.append(f"Driver Side Engine Temperature: {driver_ds18_str}")
 
     # Pass sensor min (-67F) and max (257F) to scale the bar accurately
     # (Or use custom operational limits like min_val=0, max_val=200 for better visual range)
     lines.append(
         progress_bar(driver_side_engine_bay_temperature, min_val=-67, max_val=257)
+    )
+    lines.append(f"Passenger Side Engine Temperature: {passenger_ds18_str}")
+    lines.append(
+        progress_bar(passenger_side_engine_bay_temperature, min_val=-67, max_val=257)
     )
 
     lines.append(f"LOAD: {load}%")
