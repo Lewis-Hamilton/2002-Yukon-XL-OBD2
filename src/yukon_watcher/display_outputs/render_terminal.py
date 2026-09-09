@@ -4,13 +4,15 @@ from yukon_watcher.display_outputs.stereo_screen import print_screen
 from yukon_watcher.obd_utils import obd_state
 
 BAR_WIDTH = 54
-CONNECTION_BAR_WIDTH = 12  # Small and deliberate -- not a full-width gauge
+CONNECTION_BAR_WIDTH = len("OBD CONNECTION")
+SPACING = 2
+IDLE_BAR_WIDTH = BAR_WIDTH - CONNECTION_BAR_WIDTH - SPACING  # 38
 
 
-def loading_bar():
-    BLOCK_WIDTH = 20
+def loading_bar(width):
+    BLOCK_WIDTH = min(15, width)
     BAR_SPEED = 30
-    travel = BAR_WIDTH - BLOCK_WIDTH
+    travel = width - BLOCK_WIDTH
     period = travel * 2
     position = int(time.time() * BAR_SPEED) % period
     if position >= travel:
@@ -18,31 +20,38 @@ def loading_bar():
     return (
         "\u2591" * position
         + "\u2588" * BLOCK_WIDTH
-        + "\u2591" * (BAR_WIDTH - BLOCK_WIDTH - position)
+        + "\u2591" * (width - BLOCK_WIDTH - position)
     )
 
 
-def idle_indicator(idle_status):
+def idle_indicator(idle_status, width):
     if idle_status is None:
-        # No OBD data to base this on -- blank, not "not idle"
-        return "\u2591" * BAR_WIDTH
+        return "\u2591" * width
     if idle_status:
-        return "\u2588" * BAR_WIDTH
-    return loading_bar()
+        return "\u2588" * width
+    return loading_bar(width)
 
 
-def connection_indicator(is_connected):
-    """Solid when OBD is connected, empty when it isn't. No text, no
-    error messages -- just a steady status bar that can't corrupt the
-    fixed gauge layout the way a stray print() would.
-    """
+def connection_indicator(is_connected, width):
     if is_connected:
-        return "\u2588" * CONNECTION_BAR_WIDTH
-    return "\u2591" * CONNECTION_BAR_WIDTH
+        return "\u2588" * width
+    return "\u2591" * width
 
 
-def progress_bar(bar_data):
-    bar_fill = int((min(bar_data, 100) / 100) * BAR_WIDTH)
+def progress_bar(val, min_val=0, max_val=100):
+    """
+    Renders a gauge bar scaled to any custom [min_val, max_val] range.
+    """
+    if val is None:
+        return "\u2591" * BAR_WIDTH
+
+    # Clamp value within [min_val, max_val] bounds
+    clamped_val = max(min_val, min(val, max_val))
+
+    # Calculate zero-to-one ratio across the custom scale
+    pct = (clamped_val - min_val) / (max_val - min_val)
+
+    bar_fill = int(pct * BAR_WIDTH)
     bar = "\u2588" * bar_fill + "\u2591" * (BAR_WIDTH - bar_fill)
     return bar
 
@@ -58,7 +67,15 @@ def render_terminal(data_store):
     pi_cpu_temp = data_store.get("PI CPU Temperature")
     pi_cpu_usage = data_store.get("PI CPU Usage")
     pi_ram_usage = data_store.get("PI RAM Usage")
-    idle_bar = idle_indicator(idle_status)
+    driver_side_engine_bay_temperature = data_store.get(
+        "Driver Side Engine Bay Temperature"
+    )
+    passenger_side_engine_bay_temperature = data_store.get(
+        "Passenger Side Engine Bay Temperature"
+    )
+
+    idle_bar = idle_indicator(idle_status, IDLE_BAR_WIDTH)
+    conn_bar = connection_indicator(obd_state.is_connected, CONNECTION_BAR_WIDTH)
 
     # Pi temp status
     if pi_cpu_temp is None:
@@ -66,15 +83,38 @@ def render_terminal(data_store):
     else:
         pi_str = f"{pi_cpu_temp}C"
 
+    # DS18B20 Temp string formatting
+    if driver_side_engine_bay_temperature is None:
+        driver_ds18_str = "--F"
+    else:
+        driver_ds18_str = f"{driver_side_engine_bay_temperature:.1f}F"
+
+    if passenger_side_engine_bay_temperature is None:
+        passenger_ds18_str = "--F"
+    else:
+        passenger_ds18_str = f"{passenger_side_engine_bay_temperature:.1f}F"
+
     divider = "━" * BAR_WIDTH
 
     lines = []
-    lines.append("Idle Status")
-    lines.append(idle_bar)
+    # Combined line for headers and status bars
+    lines.append(
+        f"{'OBD CONNECTION':<{CONNECTION_BAR_WIDTH}}{' ' * SPACING}IDLE STATUS"
+    )
+    lines.append(f"{conn_bar}{' ' * SPACING}{idle_bar}")
     lines.append(divider)
-    lines.append("OBD CONNECTION")
-    lines.append(connection_indicator(obd_state.is_connected))
-    lines.append(divider)
+    lines.append(f"Driver Side Engine Temperature: {driver_ds18_str}")
+
+    # Pass sensor min (-67F) and max (257F) to scale the bar accurately
+    # (Or use custom operational limits like min_val=0, max_val=200 for better visual range)
+    lines.append(
+        progress_bar(driver_side_engine_bay_temperature, min_val=-67, max_val=257)
+    )
+    lines.append(f"Passenger Side Engine Temperature: {passenger_ds18_str}")
+    lines.append(
+        progress_bar(passenger_side_engine_bay_temperature, min_val=-67, max_val=257)
+    )
+
     lines.append(f"LOAD: {load}%")
     lines.append(progress_bar(load))
     lines.append(f"THROTTLE: {throttle}%")
@@ -96,6 +136,8 @@ def data_animation():
 
     for value in steps:
         fake_store = {
+            "Driver Side Engine Bay Temperature": value,
+            "Passenger Side Engine Bay Temperature": value,
             "Engine Load": value,
             "Throttle Position": value,
             "PI CPU Temperature": value,

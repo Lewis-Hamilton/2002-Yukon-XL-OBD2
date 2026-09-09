@@ -21,3 +21,11 @@ Auto Start on boot
 4. `sudo systemctl enable yukon.service`
 5. reboot
 6. will now run on boot
+
+Add temperature probes
+
+1. Edit config `sudo nano /boot/firmware/config.txt`
+2. Add at the bottom `dtoverlay=w1-gpio`
+3. Reboot
+4. Plug in the sensors
+5. get sensor id `ls /sys/bus/w1/devices/`
