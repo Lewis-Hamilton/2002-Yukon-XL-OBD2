@@ -29,3 +29,11 @@ Add temperature probes
 3. Reboot
 4. Plug in the sensors
 5. get sensor id `ls /sys/bus/w1/devices/`
+
+Add current sensor (ADS1115 + HSTS016L)
+
+1. Launch Raspberry Pi configuration - `sudo raspi-config`
+2. Enable ARM I2C Interface - Interface Options -> I2C -> Yes -> Finish
+3. Load driver module - `sudo modprobe i2c-dev`
+4. Install I2C Tools - `sudo apt install i2c-tools`
+5. Verify ADS1115 ADC is detected - `sudo i2cdetect -y 1`
