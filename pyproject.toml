@@ -10,6 +10,7 @@ dependencies = [
     "psutil",
     "flask",
     "gpiozero",
+    "adafruit-circuitpython-ads1x15",
 ]
 
 [tool.setuptools.packages.find]
