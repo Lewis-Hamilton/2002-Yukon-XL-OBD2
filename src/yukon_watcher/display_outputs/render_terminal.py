@@ -73,7 +73,7 @@ def render_terminal(data_store):
     passenger_side_engine_bay_temperature = data_store.get(
         "Passenger Side Engine Bay Temperature"
     )
-
+    alternator_current = data_store.get("Alternator Current")
     idle_bar = idle_indicator(idle_status, IDLE_BAR_WIDTH)
     conn_bar = connection_indicator(obd_state.is_connected, CONNECTION_BAR_WIDTH)
 
@@ -93,6 +93,11 @@ def render_terminal(data_store):
         passenger_ds18_str = "--F"
     else:
         passenger_ds18_str = f"{passenger_side_engine_bay_temperature:.1f}F"
+
+    if alternator_current is None:
+        alternator_current_str = "--A"
+    else:
+        alternator_current_str = f"{alternator_current:.2f}A"
 
     divider = "━" * BAR_WIDTH
 
@@ -114,6 +119,8 @@ def render_terminal(data_store):
     lines.append(
         progress_bar(passenger_side_engine_bay_temperature, min_val=-67, max_val=257)
     )
+    lines.append(f"Alternator Current: {alternator_current_str}")
+    lines.append(progress_bar(alternator_current, min_val=0, max_val=200))
 
     lines.append(f"LOAD: {load}%")
     lines.append(progress_bar(load))
@@ -122,8 +129,9 @@ def render_terminal(data_store):
     lines.append(divider)
     lines.append(f"PI Temperature: {pi_str}")
     lines.append(progress_bar(pi_cpu_temp))
-    lines.append(f"CPU: {pi_cpu_usage}%")
-    lines.append(progress_bar(pi_cpu_usage))
+    # Removing this because not enough room on screen, could add back later
+    # lines.append(f"CPU: {pi_cpu_usage}%")
+    # lines.append(progress_bar(pi_cpu_usage))
     lines.append(f"RAM: {pi_ram_usage}%")
     lines.append(progress_bar(pi_ram_usage))
 
@@ -138,6 +146,7 @@ def data_animation():
         fake_store = {
             "Driver Side Engine Bay Temperature": value,
             "Passenger Side Engine Bay Temperature": value,
+            "Alternator Current": value,
             "Engine Load": value,
             "Throttle Position": value,
             "PI CPU Temperature": value,

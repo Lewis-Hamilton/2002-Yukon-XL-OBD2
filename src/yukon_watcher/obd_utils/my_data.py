@@ -4,6 +4,7 @@ from yukon_watcher.args import parser
 from yukon_watcher.constants.sensor_ids import SensorIds
 from yukon_watcher.obd_utils import obd_state
 from yukon_watcher.obd_utils.obd_module import obd
+from yukon_watcher.pi_utils.get_amp_data import get_hsts016l_current_amps
 from yukon_watcher.pi_utils.get_pi_data import (
     get_pi_cpu_temp,
     get_pi_cpu_usage,
@@ -107,6 +108,12 @@ COOLANT_TEMP = ObdData(
     priority="medium",
     textToReplace=" degree_Celsius",
     conversion=Conversion(amount=1.8, offset=32),
+)
+
+ALTERNATOR_CURRENT = AddedData(
+    name="Alternator Current",
+    unit="Amps",
+    real_func=lambda: get_hsts016l_current_amps(),
 )
 
 DRIVER_SIDE_ENGINE_BAY_TEMP = AddedData(
@@ -350,6 +357,7 @@ VOLTAGE = ObdData(
 all_data = [
     # AUX_INPUT_STATUS,
     COOLANT_TEMP,
+    ALTERNATOR_CURRENT,
     DRIVER_SIDE_ENGINE_BAY_TEMP,
     PASSENGER_SIDE_ENGINE_BAY_TEMP,
     ENGINE_LOAD,
