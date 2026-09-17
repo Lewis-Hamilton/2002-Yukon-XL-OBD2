@@ -12,7 +12,9 @@ ads.gain = 1
 
 
 def get_hsts016l_current_amps(
-    ads_instance: ADS.ADS1115 = ads, mv_per_amp: float = 62.5
+    ads_instance: ADS.ADS1115 = ads,
+    mv_per_amp: float = 3.125,
+    deadband_amps: float = 0.2,
 ) -> float | None:
     """
     Reads differential voltage between A0 (Vout) and A1 (Vref) on ADS1115
@@ -20,15 +22,19 @@ def get_hsts016l_current_amps(
     Returns None if I2C or hardware reading fails.
     """
     try:
-        # Measure differential input A0 - A1
+        # Measure differential input A0 (Vout) - A1 (Vref)
         chan = AnalogIn(ads_instance, ADS.P0, ADS.P1)
 
-        # chan.voltage returns value in Volts; convert to millivolts
+        # Convert voltage from Volts to Millivolts
         diff_voltage_mv = chan.voltage * 1000.0
 
-        # Convert mV delta to Amperes
+        # Calculate current in Amperes
         current_amps = diff_voltage_mv / mv_per_amp
 
-        return round(current_amps, 3)
+        # Filter out minor idle noise around zero
+        if abs(current_amps) < deadband_amps:
+            current_amps = 0.0
+
+        return round(current_amps, 2)
     except (OSError, ValueError, AttributeError):
         return None
