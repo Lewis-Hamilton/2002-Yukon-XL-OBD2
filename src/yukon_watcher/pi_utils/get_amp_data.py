@@ -22,16 +22,16 @@ def get_hsts016l_current_amps(
     Returns None if I2C or hardware reading fails.
     """
     try:
-        # --- DEBUG READINGS ---
-        chan0 = AnalogIn(ads_instance, ADS.P0)  # Vout (Yellow)
-        chan1 = AnalogIn(ads_instance, ADS.P1)  # Vref (White)
+        # --- DEBUG READINGS (Using raw integers 0 and 1) ---
+        chan0 = AnalogIn(ads_instance, 0)  # Vout (Yellow)
+        chan1 = AnalogIn(ads_instance, 1)  # Vref (White)
         print(
             f"[DEBUG] A0 (Vout): {chan0.voltage:.3f}V | A1 (Vref): {chan1.voltage:.3f}V"
         )
-        # ----------------------
+        # ---------------------------------------------------
 
-        # Measure differential input A0 - A1
-        chan_diff = AnalogIn(ads_instance, ADS.P0, ADS.P1)
+        # Measure differential input A0 - A1 (Using raw integers)
+        chan_diff = AnalogIn(ads_instance, 0, 1)
         diff_voltage_mv = chan_diff.voltage * 1000.0
 
         print(f"[DEBUG] Raw Diff: {diff_voltage_mv:+.2f}mV")
