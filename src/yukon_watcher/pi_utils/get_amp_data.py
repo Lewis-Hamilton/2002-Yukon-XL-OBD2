@@ -14,30 +14,23 @@ ads.gain = 1
 def get_hsts016l_current_amps(
     ads_instance: ADS.ADS1115 = ads,
     mv_per_amp: float = 3.125,
-    deadband_amps: float = 0.2,
+    zero_offset_mv: float = 7.0,  # Baseline offset with 0 Amps passing through sensor
+    deadband_amps: float = 0.5,
 ) -> float | None:
     """
     Reads differential voltage between A0 (Vout) and A1 (Vref) on ADS1115
-    and converts to current in Amperes.
-    Returns None if I2C or hardware reading fails.
+    and converts to current in Amperes, accounting for baseline offset.
     """
     try:
-        # --- DEBUG READINGS (Using raw integers 0 and 1) ---
-        chan0 = AnalogIn(ads_instance, 0)  # Vout (Yellow)
-        chan1 = AnalogIn(ads_instance, 1)  # Vref (White)
-        print(
-            f"[DEBUG] A0 (Vout): {chan0.voltage:.3f}V | A1 (Vref): {chan1.voltage:.3f}V"
-        )
-        # ---------------------------------------------------
-
-        # Measure differential input A0 - A1 (Using raw integers)
+        # Measure differential input A0 - A1
         chan_diff = AnalogIn(ads_instance, 0, 1)
-        diff_voltage_mv = chan_diff.voltage * 1000.0
+        raw_diff_mv = chan_diff.voltage * 1000.0
 
-        print(f"[DEBUG] Raw Diff: {diff_voltage_mv:+.2f}mV")
+        # Subtract baseline hardware offset (7.0 mV)
+        calibrated_diff_mv = raw_diff_mv - zero_offset_mv
 
-        # Convert mV delta to Amperes
-        current_amps = diff_voltage_mv / mv_per_amp
+        # Convert calibrated mV delta to Amperes
+        current_amps = calibrated_diff_mv / mv_per_amp
 
         # Filter out minor idle noise around zero
         if abs(current_amps) < deadband_amps:
